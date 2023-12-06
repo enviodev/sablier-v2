@@ -9,36 +9,28 @@ networks:
         handler: src/EventHandlers.ts
         events:
           - event: Approval(address indexed owner, address indexed approved, uint256 indexed tokenId)
-            requiredEntities:
-              - name: EventsSummary
+            requiredEntities: []
           - event: ApprovalForAll(address indexed owner, address indexed operator, bool approved)
-            requiredEntities:
-              - name: EventsSummary
+            requiredEntities: []
           - event: CancelLockupStream(uint256 indexed streamId, address indexed sender, address indexed recipient, uint128 senderAmount, uint128 recipientAmount)
             requiredEntities:
-              - name: EventsSummary
               - name: Stream
               - name: Watcher
           - event: CreateLockupLinearStream(uint256 streamId, address funder, address indexed sender, address indexed recipient, (uint128,uint128,uint128) amounts, address indexed asset, bool cancelable, (uint40,uint40,uint40) range, address broker)
             requiredEntities:
               - name: Contract
-              - name: EventsSummary
               - name: Watcher
           - event: RenounceLockupStream(uint256 indexed streamId)
             requiredEntities:
-              - name: EventsSummary
               - name: Stream
               - name: Watcher
               - name: Contract
           - event: Transfer(address indexed from, address indexed to, uint256 indexed tokenId)
-            requiredEntities:
-              - name: EventsSummary
+            requiredEntities: []
           - event: TransferAdmin(address indexed oldAdmin, address indexed newAdmin)
             requiredEntities:
-              - name: EventsSummary
               - name: Contract
           - event: WithdrawFromLockupStream(uint256 indexed streamId, address indexed to, uint128 amount)
             requiredEntities:
-              - name: EventsSummary
               - name: Stream
               - name: Watcher

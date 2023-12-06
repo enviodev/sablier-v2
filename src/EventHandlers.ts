@@ -20,12 +20,7 @@ import {
   SablierV2LockupLinearContract_WithdrawFromLockupStream_handler,
 } from "../generated/src/Handlers.gen";
 
-import {
-  EventsSummaryEntity,
-  StreamEntity,
-  WatcherEntity,
-  ContractEntity,
-} from "./src/Types.gen";
+import { StreamEntity, WatcherEntity, ContractEntity } from "./src/Types.gen";
 
 import {
   createCreateAction,
@@ -47,62 +42,19 @@ import {
   updateWatcherStreamIndex,
 } from "./helpers/watcher";
 
-const GLOBAL_EVENTS_SUMMARY_KEY = "GlobalEventsSummary";
 // TODO refactor this into global constants
 const GLOBAL_WATCHER_ID = "1";
 
-const INITIAL_EVENTS_SUMMARY: EventsSummaryEntity = {
-  id: GLOBAL_EVENTS_SUMMARY_KEY,
-  sablierV2LockupLinear_ApprovalCount: BigInt(0),
-  sablierV2LockupLinear_ApprovalForAllCount: BigInt(0),
-  sablierV2LockupLinear_CancelLockupStreamCount: BigInt(0),
-  sablierV2LockupLinear_CreateLockupLinearStreamCount: BigInt(0),
-  sablierV2LockupLinear_RenounceLockupStreamCount: BigInt(0),
-  sablierV2LockupLinear_TransferCount: BigInt(0),
-  sablierV2LockupLinear_TransferAdminCount: BigInt(0),
-  sablierV2LockupLinear_WithdrawFromLockupStreamCount: BigInt(0),
-};
+SablierV2LockupLinearContract_Approval_loader(({ event, context }) => {});
 
-SablierV2LockupLinearContract_Approval_loader(({ event, context }) => {
-  context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
-});
+SablierV2LockupLinearContract_Approval_handler(({ event, context }) => {});
+SablierV2LockupLinearContract_ApprovalForAll_loader(({ event, context }) => {});
 
-SablierV2LockupLinearContract_Approval_handler(({ event, context }) => {
-  const summary = context.EventsSummary.get(GLOBAL_EVENTS_SUMMARY_KEY);
-
-  const currentSummaryEntity: EventsSummaryEntity =
-    summary ?? INITIAL_EVENTS_SUMMARY;
-
-  const nextSummaryEntity = {
-    ...currentSummaryEntity,
-    sablierV2LockupLinear_ApprovalCount:
-      currentSummaryEntity.sablierV2LockupLinear_ApprovalCount + BigInt(1),
-  };
-
-  context.EventsSummary.set(nextSummaryEntity);
-});
-SablierV2LockupLinearContract_ApprovalForAll_loader(({ event, context }) => {
-  context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
-});
-
-SablierV2LockupLinearContract_ApprovalForAll_handler(({ event, context }) => {
-  const summary = context.EventsSummary.get(GLOBAL_EVENTS_SUMMARY_KEY);
-
-  const currentSummaryEntity: EventsSummaryEntity =
-    summary ?? INITIAL_EVENTS_SUMMARY;
-
-  const nextSummaryEntity = {
-    ...currentSummaryEntity,
-    sablierV2LockupLinear_ApprovalForAllCount:
-      currentSummaryEntity.sablierV2LockupLinear_ApprovalForAllCount +
-      BigInt(1),
-  };
-
-  context.EventsSummary.set(nextSummaryEntity);
-});
+SablierV2LockupLinearContract_ApprovalForAll_handler(
+  ({ event, context }) => {}
+);
 SablierV2LockupLinearContract_CancelLockupStream_loader(
   ({ event, context }) => {
-    context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
     context.Watcher.load(GLOBAL_WATCHER_ID);
     let streamTokenId = event.params.streamId;
     let streamId = generateStreamId(event.srcAddress, streamTokenId);
@@ -112,19 +64,6 @@ SablierV2LockupLinearContract_CancelLockupStream_loader(
 
 SablierV2LockupLinearContract_CancelLockupStream_handler(
   ({ event, context }) => {
-    const summary = context.EventsSummary.get(GLOBAL_EVENTS_SUMMARY_KEY);
-
-    const currentSummaryEntity: EventsSummaryEntity =
-      summary ?? INITIAL_EVENTS_SUMMARY;
-
-    const nextSummaryEntity = {
-      ...currentSummaryEntity,
-      sablierV2LockupLinear_CancelLockupStreamCount:
-        currentSummaryEntity.sablierV2LockupLinear_CancelLockupStreamCount +
-        BigInt(1),
-    };
-
-    context.EventsSummary.set(nextSummaryEntity);
     const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
 
     const watcherEntity: WatcherEntity =
@@ -171,7 +110,6 @@ SablierV2LockupLinearContract_CancelLockupStream_handler(
 SablierV2LockupLinearContract_CreateLockupLinearStream_loader(
   ({ event, context }) => {
     context.Contract.load(event.srcAddress.toString());
-    context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
     context.Watcher.load(GLOBAL_WATCHER_ID);
   }
 );
@@ -179,7 +117,6 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_loader(
 SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
   ({ event, context }) => {
     const contract = context.Contract.get(event.srcAddress.toString());
-    const summary = context.EventsSummary.get(GLOBAL_EVENTS_SUMMARY_KEY);
     const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
 
     const watcherEntity: WatcherEntity =
@@ -209,7 +146,7 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
 
     // Updating entity values
     context.Action.set(
-      updateActionStreamInfo(newActionEntity, newStreamEntity.id)
+      updateActionStreamInfo(newStreamEntity.id, newActionEntity)
     );
     context.Stream.set(
       updateStreamRenounceInfo(event, newStreamEntity, newActionEntity)
@@ -218,28 +155,11 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
     context.Watcher.set(
       updateWatcherActionIndex(updateWatcherStreamIndex(watcherEntity))
     );
-
-    // Create the asset action
-
-    // Save the asset
-
-    const currentSummaryEntity: EventsSummaryEntity =
-      summary ?? INITIAL_EVENTS_SUMMARY;
-
-    const nextSummaryEntity = {
-      ...currentSummaryEntity,
-      sablierV2LockupLinear_CreateLockupLinearStreamCount:
-        currentSummaryEntity.sablierV2LockupLinear_CreateLockupLinearStreamCount +
-        BigInt(1),
-    };
-
-    context.EventsSummary.set(nextSummaryEntity);
   }
 );
 
 SablierV2LockupLinearContract_RenounceLockupStream_loader(
   ({ event, context }) => {
-    context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
     let streamTokenId = event.params.streamId;
     let streamId = generateStreamId(event.srcAddress, streamTokenId);
     context.Stream.load(streamId, {});
@@ -251,7 +171,6 @@ SablierV2LockupLinearContract_RenounceLockupStream_loader(
 SablierV2LockupLinearContract_RenounceLockupStream_handler(
   ({ event, context }) => {
     const contract = context.Contract.get(event.srcAddress.toString());
-    const summary = context.EventsSummary.get(GLOBAL_EVENTS_SUMMARY_KEY);
     const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
 
     const watcherEntity: WatcherEntity =
@@ -265,18 +184,6 @@ SablierV2LockupLinearContract_RenounceLockupStream_handler(
         "LockupLinear"
       );
 
-    const currentSummaryEntity: EventsSummaryEntity =
-      summary ?? INITIAL_EVENTS_SUMMARY;
-
-    const nextSummaryEntity = {
-      ...currentSummaryEntity,
-      sablierV2LockupLinear_RenounceLockupStreamCount:
-        currentSummaryEntity.sablierV2LockupLinear_RenounceLockupStreamCount +
-        BigInt(1),
-    };
-
-    context.EventsSummary.set(nextSummaryEntity);
-
     let streamTokenId = event.params.streamId;
     let streamId = generateStreamId(event.srcAddress, streamTokenId);
     let stream = context.Stream.get(streamId);
@@ -284,85 +191,50 @@ SablierV2LockupLinearContract_RenounceLockupStream_handler(
     if (stream == undefined) {
       return;
     }
-  
-    let action = createRenounceAction(event, watcherEntity, contractEntity);
-  
-    context.Action.set(
-      updateActionStreamInfo(stream, action)
-    );
+
+    let action = createRenounceAction(event, watcherEntity, contractEntity.id);
+
+    context.Action.set(updateActionStreamInfo(stream.id, action));
 
     let streamEntity = {
-        ...stream,
-        cancelable : false,
-        renounceAction : action.id,
-        renounceTime : BigInt(event.blockTimestamp),
-    }
-  
-    context.Stream.set(streamEntity)
-    context.Watcher.set(updateWatcher(watcherEntity));
+      ...stream,
+      cancelable: false,
+      renounceAction: action.id,
+      renounceTime: BigInt(event.blockTimestamp),
+    };
+
+    context.Stream.set(streamEntity);
+    context.Watcher.set(updateWatcherActionIndex(watcherEntity));
   }
 );
-SablierV2LockupLinearContract_Transfer_loader(({ event, context }) => {
-  context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
-});
+SablierV2LockupLinearContract_Transfer_loader(({ event, context }) => {});
 
-SablierV2LockupLinearContract_Transfer_handler(({ event, context }) => {
-  const summary = context.EventsSummary.get(GLOBAL_EVENTS_SUMMARY_KEY);
-
-  const currentSummaryEntity: EventsSummaryEntity =
-    summary ?? INITIAL_EVENTS_SUMMARY;
-
-  const nextSummaryEntity = {
-    ...currentSummaryEntity,
-    sablierV2LockupLinear_TransferCount:
-      currentSummaryEntity.sablierV2LockupLinear_TransferCount + BigInt(1),
-  };
-
-  context.EventsSummary.set(nextSummaryEntity);
-});
-
-
+SablierV2LockupLinearContract_Transfer_handler(({ event, context }) => {});
 
 SablierV2LockupLinearContract_TransferAdmin_loader(({ event, context }) => {
-  context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
   context.Contract.load(event.srcAddress.toString());
 });
 
-
-
 SablierV2LockupLinearContract_TransferAdmin_handler(({ event, context }) => {
-  const summary = context.EventsSummary.get(GLOBAL_EVENTS_SUMMARY_KEY);
+  let contract = context.Contract.get(event.srcAddress.toString());
 
-  const currentSummaryEntity: EventsSummaryEntity =
-    summary ?? INITIAL_EVENTS_SUMMARY;
+  if (contract == undefined) {
+    context.log.error(
+      "Contract does not exist. Cannot transfer admin to contract that does not exist."
+    );
+    return;
+  }
 
-  const nextSummaryEntity = {
-    ...currentSummaryEntity,
-    sablierV2LockupLinear_TransferAdminCount:
-      currentSummaryEntity.sablierV2LockupLinear_TransferAdminCount + BigInt(1),
+  let updatedContractEntity = {
+    ...contract,
+    admin: event.params.newAdmin,
   };
 
-  context.EventsSummary.set(nextSummaryEntity);
-
-let contract = context.Contract.get(event.srcAddress.toString())
-
-if (contract == undefined) {
-  context.log.error("Contract does not exist. Cannot transfer admin to contract that does not exist.")
-  return
-}
-
-let updatedContractEntity = {
-  ...contract,
-  admin: event.params.newAdmin
-}
-
-context.Contract.set(updatedContractEntity)
-
+  context.Contract.set(updatedContractEntity);
 });
 
 SablierV2LockupLinearContract_WithdrawFromLockupStream_loader(
   ({ event, context }) => {
-    context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
     context.Watcher.load(GLOBAL_WATCHER_ID);
     let streamTokenId = event.params.streamId;
     let streamId = generateStreamId(event.srcAddress, streamTokenId);
@@ -372,7 +244,6 @@ SablierV2LockupLinearContract_WithdrawFromLockupStream_loader(
 
 SablierV2LockupLinearContract_WithdrawFromLockupStream_handler(
   ({ event, context }) => {
-    const summary = context.EventsSummary.get(GLOBAL_EVENTS_SUMMARY_KEY);
     const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
 
     let streamTokenId = event.params.streamId;
@@ -400,18 +271,7 @@ SablierV2LockupLinearContract_WithdrawFromLockupStream_handler(
       context.Stream.set(updateStreamWithdrawalInfo(event, stream));
     }
 
-    const currentSummaryEntity: EventsSummaryEntity =
-      summary ?? INITIAL_EVENTS_SUMMARY;
-
-    const nextSummaryEntity = {
-      ...currentSummaryEntity,
-      sablierV2LockupLinear_WithdrawFromLockupStreamCount:
-        currentSummaryEntity.sablierV2LockupLinear_WithdrawFromLockupStreamCount +
-        BigInt(1),
-    };
-
-    context.EventsSummary.set(nextSummaryEntity);
-    context.Action.set(updateActionStreamInfo(newActionEntity, streamId));
+    context.Action.set(updateActionStreamInfo(streamId, newActionEntity));
     context.Watcher.set(updateWatcherActionIndex(watcherEntity));
   }
 );

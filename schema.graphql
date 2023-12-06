@@ -1,14 +1,3 @@
-type EventsSummary {
-  id: ID!
-  sablierV2LockupLinear_ApprovalCount: BigInt!
-  sablierV2LockupLinear_ApprovalForAllCount: BigInt!
-  sablierV2LockupLinear_CancelLockupStreamCount: BigInt!
-  sablierV2LockupLinear_CreateLockupLinearStreamCount: BigInt!
-  sablierV2LockupLinear_RenounceLockupStreamCount: BigInt!
-  sablierV2LockupLinear_TransferCount: BigInt!
-  sablierV2LockupLinear_TransferAdminCount: BigInt!
-  sablierV2LockupLinear_WithdrawFromLockupStreamCount: BigInt!
-}
 type Asset {
   "unique identifier resolving to the ERC20 asset/token address"
   id: ID!

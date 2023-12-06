@@ -96,18 +96,16 @@ export function createCancelAction(
 export function createRenounceAction(
   event: eventLog<SablierV2LockupLinearContract_RenounceLockupStreamEvent_eventArgs>,
   watcher: WatcherEntity,
-  contract: ContractEntity
+  contractAddress: string
 ): ActionEntity {
   let actionEntity: ActionEntity = createAction(
     "Renounce",
     event,
     watcher,
-    contract
+    contractAddress
   );
-    return actionEntity;
+  return actionEntity;
 }
-
-
 
 export function createWithdrawAction(
   event: eventLog<SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs>,
