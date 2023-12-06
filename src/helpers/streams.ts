@@ -125,14 +125,6 @@ export function createLinearStream(
     sender: event.params.sender,
     recipient: event.params.recipient,
     parties: [event.params.sender, event.params.recipient],
-
-    depositAmount: event.params.amounts[0],
-    brokerFeeAmount: event.params.amounts[1],
-    protocolFeeAmount: event.params.amounts[2],
-    intactAmount: event.params.amounts[0],
-
-    startTime: event.params.range[0],
-    endTime: event.params.range[2],
     cancelable: event.params.cancelable,
     duration: duration,
     asset: event.params.asset,
