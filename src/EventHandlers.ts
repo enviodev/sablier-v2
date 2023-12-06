@@ -28,6 +28,7 @@ import {
   updateActionStreamInfo,
   createRenounceAction,
   createWithdrawAction,
+  createApprovalAction,
 } from "./helpers/action";
 import { createContract } from "./helpers/contract";
 import {
@@ -45,9 +46,66 @@ import {
 // TODO refactor this into global constants
 const GLOBAL_WATCHER_ID = "1";
 
-SablierV2LockupLinearContract_Approval_loader(({ event, context }) => {});
+SablierV2LockupLinearContract_Approval_loader(({ event, context }) => {
+  context.Watcher.load(GLOBAL_WATCHER_ID);
+  let streamTokenId = event.params.tokenId;
+  let streamId = generateStreamId(event.srcAddress, streamTokenId);
+  context.Stream.load(streamId, {});
+});
 
-SablierV2LockupLinearContract_Approval_handler(({ event, context }) => {});
+SablierV2LockupLinearContract_Approval_handler(({ event, context }) => {
+  const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
+
+  const watcherEntity: WatcherEntity =
+    watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+
+  let actionPartial = createApprovalAction(
+    event,
+    watcherEntity,
+    event.srcAddress.toString()
+  );
+
+  let streamTokenId = event.params.tokenId;
+  let streamId = generateStreamId(event.srcAddress, streamTokenId);
+  let stream = context.Stream.get(streamId);
+
+  let action = { ...actionPartial, stream: streamId.toString() };
+
+  context.Action.set(action);
+
+  if (stream == undefined) {
+    context.log.info(
+      `[SABLIER] Stream hasn't been registered before this approval event: ${streamId}`
+    );
+  }
+
+  context.Watcher.set(updateWatcherActionIndex(watcherEntity));
+});
+
+// export function handleApproval(event: EventApproval): void {
+//   let id = event.params.tokenId;
+//   let stream = getStreamByIdFromSource(id);
+
+//   if (stream == null) {
+//     log.info(
+//       "[SABLIER] Stream hasn't been registered before this approval event: {}",
+//       [id.toHexString()],
+//     );
+//     return;
+//   }
+
+//   let action = createAction(event);
+//   action.category = "Approval";
+
+//   action.addressA = event.params.owner;
+//   action.addressB = event.params.approved;
+
+//   /** --------------- */
+
+//   action.stream = stream.id;
+//   action.save();
+// }
+
 SablierV2LockupLinearContract_ApprovalForAll_loader(({ event, context }) => {});
 
 SablierV2LockupLinearContract_ApprovalForAll_handler(

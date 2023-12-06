@@ -8,6 +8,7 @@ import {
   SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs,
   SablierV2LockupLinearContract_RenounceLockupStreamEvent_eventArgs,
   SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
+  SablierV2LockupLinearContract_ApprovalEvent_eventArgs,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";
@@ -124,6 +125,27 @@ export function createWithdrawAction(
     addressA: event.srcAddress.toString(),
     addressB: event.params.to,
     amountB: event.params.amount,
+  };
+
+  return actionEntity;
+}
+
+export function createApprovalAction(
+  event: eventLog<SablierV2LockupLinearContract_ApprovalEvent_eventArgs>,
+  watcher: WatcherEntity,
+  contract_address: string
+): ActionEntity {
+  let partialActionEntity: ActionEntity = createAction(
+    "Approval",
+    event,
+    watcher,
+    contract_address
+  );
+
+  let actionEntity: ActionEntity = {
+    ...partialActionEntity,
+    addressA: event.params.owner,
+    addressB: event.params.approved, // todo: verify this is not a bug
   };
 
   return actionEntity;
