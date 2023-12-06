@@ -48,7 +48,6 @@ function createStream(
 
   let alias = generateStreamAlias(contract, tokenId);
 
-  /** --------------- */
   let partialStreamEntity: StreamEntity = {
     id: id,
     tokenId: tokenId,
@@ -58,31 +57,31 @@ function createStream(
     hash: event.transactionHash,
     timestamp: BigInt(event.blockTimestamp),
     chainId: getChainId(),
-    proxied: false,
-    canceled: false,
-    renounceAction: null,
-    canceledAction: null,
-    cliffAmount: 0n,
-    cliffTime: 0n,
-    withdrawnAmount: 0n,
     category: "",
-    funder: event.params.funder,
-    sender: event.params.sender,
     recipient: event.params.recipient,
     parties: [event.params.sender, event.params.recipient],
+    funder: event.params.funder,
+    sender: event.params.sender,
+    proxender: "",
+    proxied: false,
+    cliff: false,
+    asset: event.params.asset,
+    cancelable: event.params.cancelable,
+    renounceAction: null,
+    renounceTime: 0n,
+    canceled: false,
+    canceledAction: null,
+    canceledTime: 0n,
+    cliffTime: 0n,
+    cliffAmount: 0n,
+    endTime: event.params.range[2],
+    startTime: event.params.range[0],
+    duration: event.params.range[2] - event.params.range[0],
     depositAmount: event.params.amounts[0],
+    intactAmount: event.params.amounts[0],
+    withdrawnAmount: 0n,
     brokerFeeAmount: event.params.amounts[1],
     protocolFeeAmount: event.params.amounts[2],
-    intactAmount: event.params.amounts[0],
-    startTime: event.params.range[0],
-    endTime: event.params.range[2],
-    cancelable: event.params.cancelable,
-    duration: 0n,
-    asset: event.params.asset,
-    cliff: false,
-    proxender: "",
-    renounceTime: 0n,
-    canceledTime: 0n,
   };
 
   return partialStreamEntity;
@@ -101,7 +100,6 @@ export function createLinearStream(
     contract
   );
 
-  /** --------------- */
   let deposit = event.params.amounts[0];
   let duration = event.params.range[2] - event.params.range[0];
   let cliffDuration = event.params.range[1] - event.params.range[0];
@@ -111,11 +109,11 @@ export function createLinearStream(
   let cliffTime = 0n;
 
   if (cliffDuration != 0n) {
-    let cliff = true;
+    cliff = true;
     cliffAmount = div(mul(deposit, cliffDuration), duration);
     cliffTime = event.params.range[1];
   } else {
-    let cliff = false;
+    cliff = false;
     cliffAmount = 0n;
     cliffTime = 0n;
   }
@@ -146,13 +144,11 @@ export function updateStreamRenounceInfo(
   action: ActionEntity
 ): StreamEntity {
   if (stream.cancelable == false) {
-    let renounceAction = action.id;
-    let renounceTime = BigInt(event.blockTimestamp);
-    let streamEntity: StreamEntity = {
+    return {
       ...stream,
+      renounceAction: action.id,
+      renounceTime: BigInt(event.blockTimestamp),
     };
-
-    return streamEntity;
   } else {
     return stream;
   }
