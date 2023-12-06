@@ -13,10 +13,20 @@ export function createWatcher(watcher_id: string): WatcherEntity {
   return watcherEntity;
 }
 
-export function updateWatcher(watcher: WatcherEntity): WatcherEntity {
+export function updateWatcherStreamIndex(
+  watcher: WatcherEntity
+): WatcherEntity {
   return {
     ...watcher,
     streamIndex: watcher.streamIndex + 1n,
+  };
+}
+
+export function updateWatcherActionIndex(
+  watcher: WatcherEntity
+): WatcherEntity {
+  return {
+    ...watcher,
     actionIndex: watcher.actionIndex + 1n,
   };
 }

@@ -32,14 +32,20 @@ import {
   createCancelAction,
   updateActionStreamInfo,
   createRenounceAction,
+  createWithdrawAction,
 } from "./helpers/action";
 import { createContract } from "./helpers/contract";
 import {
   generateStreamId,
   createLinearStream,
   updateStreamRenounceInfo,
+  updateStreamWithdrawalInfo,
 } from "./helpers/streams";
-import { createWatcher, updateWatcher } from "./helpers/watcher";
+import {
+  createWatcher,
+  updateWatcherActionIndex,
+  updateWatcherStreamIndex,
+} from "./helpers/watcher";
 
 const GLOBAL_EVENTS_SUMMARY_KEY = "GlobalEventsSummary";
 // TODO refactor this into global constants
@@ -97,7 +103,6 @@ SablierV2LockupLinearContract_ApprovalForAll_handler(({ event, context }) => {
 SablierV2LockupLinearContract_CancelLockupStream_loader(
   ({ event, context }) => {
     context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
-    context.Contract.load(event.srcAddress.toString());
     context.Watcher.load(GLOBAL_WATCHER_ID);
     let streamTokenId = event.params.streamId;
     let streamId = generateStreamId(event.srcAddress, streamTokenId);
@@ -120,24 +125,15 @@ SablierV2LockupLinearContract_CancelLockupStream_handler(
     };
 
     context.EventsSummary.set(nextSummaryEntity);
-    const contract = context.Contract.get(event.srcAddress.toString());
     const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
 
     const watcherEntity: WatcherEntity =
       watcher ?? createWatcher(GLOBAL_WATCHER_ID);
 
-    const contractEntity: ContractEntity =
-      contract ??
-      createContract(
-        event.srcAddress.toString(),
-        event.srcAddress.toString(),
-        "LockupLinear"
-      );
-
     let actionPartial = createCancelAction(
       event,
       watcherEntity,
-      contractEntity
+      event.srcAddress.toString()
     );
 
     let streamTokenId = event.params.streamId;
@@ -167,6 +163,8 @@ SablierV2LockupLinearContract_CancelLockupStream_handler(
 
       context.Stream.set(streamEntity);
     }
+
+    context.Watcher.set(updateWatcherActionIndex(watcherEntity));
   }
 );
 
@@ -206,18 +204,20 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
     let newActionEntity = createCreateAction(
       event,
       watcherEntity,
-      contractEntity
+      event.srcAddress.toString()
     );
 
     // Updating entity values
     context.Action.set(
-      updateActionStreamInfo(newStreamEntity, newActionEntity)
+      updateActionStreamInfo(newActionEntity, newStreamEntity.id)
     );
     context.Stream.set(
       updateStreamRenounceInfo(event, newStreamEntity, newActionEntity)
     );
     context.Contract.set(contractEntity);
-    context.Watcher.set(updateWatcher(watcherEntity));
+    context.Watcher.set(
+      updateWatcherActionIndex(updateWatcherStreamIndex(watcherEntity))
+    );
 
     // Create the asset action
 
@@ -320,9 +320,15 @@ SablierV2LockupLinearContract_Transfer_handler(({ event, context }) => {
 
   context.EventsSummary.set(nextSummaryEntity);
 });
+
+
+
 SablierV2LockupLinearContract_TransferAdmin_loader(({ event, context }) => {
   context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
+  context.Contract.load(event.srcAddress.toString());
 });
+
+
 
 SablierV2LockupLinearContract_TransferAdmin_handler(({ event, context }) => {
   const summary = context.EventsSummary.get(GLOBAL_EVENTS_SUMMARY_KEY);
@@ -337,16 +343,62 @@ SablierV2LockupLinearContract_TransferAdmin_handler(({ event, context }) => {
   };
 
   context.EventsSummary.set(nextSummaryEntity);
+
+let contract = context.Contract.get(event.srcAddress.toString())
+
+if (contract == undefined) {
+  context.log.error("Contract does not exist. Cannot transfer admin to contract that does not exist.")
+  return
+}
+
+let updatedContractEntity = {
+  ...contract,
+  admin: event.params.newAdmin
+}
+
+context.Contract.set(updatedContractEntity)
+
 });
+
 SablierV2LockupLinearContract_WithdrawFromLockupStream_loader(
   ({ event, context }) => {
     context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
+    context.Watcher.load(GLOBAL_WATCHER_ID);
+    let streamTokenId = event.params.streamId;
+    let streamId = generateStreamId(event.srcAddress, streamTokenId);
+    context.Stream.load(streamId, {});
   }
 );
 
 SablierV2LockupLinearContract_WithdrawFromLockupStream_handler(
   ({ event, context }) => {
     const summary = context.EventsSummary.get(GLOBAL_EVENTS_SUMMARY_KEY);
+    const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
+
+    let streamTokenId = event.params.streamId;
+    let streamId = generateStreamId(event.srcAddress, streamTokenId);
+    const stream = context.Stream.get(streamId);
+
+    const watcherEntity: WatcherEntity =
+      watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+
+    // create Actions entity
+    let newActionEntity = createWithdrawAction(
+      event,
+      watcherEntity,
+      event.srcAddress.toString()
+    );
+
+    if (stream == undefined) {
+      context.log.info(
+        `[SABLIER] Stream hasn't been registered before this withdraw event: ${streamId}`
+      );
+      context.log.error(
+        "[SABLIER] - non existent stream, shouldnt be able to withdraw from a non existent stream"
+      );
+    } else {
+      context.Stream.set(updateStreamWithdrawalInfo(event, stream));
+    }
 
     const currentSummaryEntity: EventsSummaryEntity =
       summary ?? INITIAL_EVENTS_SUMMARY;
@@ -359,5 +411,7 @@ SablierV2LockupLinearContract_WithdrawFromLockupStream_handler(
     };
 
     context.EventsSummary.set(nextSummaryEntity);
+    context.Action.set(updateActionStreamInfo(newActionEntity, streamId));
+    context.Watcher.set(updateWatcherActionIndex(watcherEntity));
   }
 );

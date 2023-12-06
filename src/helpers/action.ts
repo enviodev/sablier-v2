@@ -7,6 +7,7 @@ import {
   SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
   SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs,
   SablierV2LockupLinearContract_RenounceLockupStreamEvent_eventArgs,
+  SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";
@@ -22,7 +23,7 @@ function createAction(
   actionType: string,
   event: eventLog<any> | eventLog<any>,
   watcher: WatcherEntity,
-  contract: ContractEntity
+  contract_address: string
 ): ActionEntity {
   let id = generateActionId(event);
   let actionEntity: ActionEntity = {
@@ -33,7 +34,7 @@ function createAction(
     timestamp: BigInt(event.blockTimestamp),
     subgraphId: watcher.actionIndex,
     chainId: BigInt(getChainInfoForAddress(event.srcAddress).chainId),
-    contract: contract.id,
+    contract: contract_address,
     addressA: "",
     addressB: "",
     amountA: 0n,
@@ -48,13 +49,13 @@ function createAction(
 export function createCreateAction(
   event: eventLog<SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs>,
   watcher: WatcherEntity,
-  contract: ContractEntity
+  contract_address: string
 ): ActionEntity {
   let partialActionEntity: ActionEntity = createAction(
     "Create",
     event,
     watcher,
-    contract
+    contract_address
   );
 
   let actionEntity: ActionEntity = {
@@ -70,13 +71,13 @@ export function createCreateAction(
 export function createCancelAction(
   event: eventLog<SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs>,
   watcher: WatcherEntity,
-  contract: ContractEntity
+  contract_address: string
 ): ActionEntity {
   let partialActionEntity: ActionEntity = createAction(
     "Cancel",
     event,
     watcher,
-    contract
+    contract_address
   );
 
   /** --------------- */
@@ -92,7 +93,6 @@ export function createCancelAction(
   return actionEntity;
 }
 
-
 export function createRenounceAction(
   event: eventLog<SablierV2LockupLinearContract_RenounceLockupStreamEvent_eventArgs>,
   watcher: WatcherEntity,
@@ -104,16 +104,39 @@ export function createRenounceAction(
     watcher,
     contract
   );
+    return actionEntity;
+}
+
+
+
+export function createWithdrawAction(
+  event: eventLog<SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs>,
+  watcher: WatcherEntity,
+  contract_address: string
+): ActionEntity {
+  let partialActionEntity: ActionEntity = createAction(
+    "Withdraw",
+    event,
+    watcher,
+    contract_address
+  );
+
+  let actionEntity: ActionEntity = {
+    ...partialActionEntity,
+    addressA: event.srcAddress.toString(),
+    addressB: event.params.to,
+    amountB: event.params.amount,
+  };
 
   return actionEntity;
 }
 
 export function updateActionStreamInfo(
-  stream: StreamEntity,
+  streamId: string,
   action: ActionEntity
 ): ActionEntity {
   return {
     ...action,
-    stream: stream.id,
+    stream: streamId,
   };
 }

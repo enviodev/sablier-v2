@@ -5,11 +5,12 @@ import {
   SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
   WatcherEntity,
   ActionEntity,
+  SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";
 
-import { mul, div } from "./maths";
+import { mul, div, add, minus } from "./maths";
 
 export function generateStreamId(
   contractAddress: string,
@@ -152,5 +153,28 @@ export function updateStreamRenounceInfo(
     };
   } else {
     return stream;
+  }
+}
+
+export function updateStreamWithdrawalInfo(
+  event: eventLog<SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs>,
+  stream: StreamEntity
+): StreamEntity {
+  let amount = event.params.amount;
+  let withdrawn = add(stream.withdrawnAmount, amount);
+
+  if (stream.canceledAction) {
+    return {
+      ...stream,
+      withdrawnAmount: withdrawn,
+      // The intact amount (recipient) has been set in the cancel action, now subtract
+      intactAmount: minus(stream.intactAmount, amount),
+    };
+  } else {
+    return {
+      ...stream,
+      withdrawnAmount: withdrawn,
+      intactAmount: minus(stream.intactAmount, withdrawn),
+    };
   }
 }
