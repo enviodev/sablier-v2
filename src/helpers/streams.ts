@@ -64,7 +64,6 @@ function createStream(
     sender: event.params.sender,
     proxender: "",
     chainId: BigInt(chainInfo.chainId),
-    // chainName: chainInfo.chainName,
     proxied: false,
     cliff: false,
     asset: event.params.asset,
