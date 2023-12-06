@@ -1,0 +1,84 @@
+type EventsSummary {
+  id: ID!
+    sablierV2LockupLinear_Approval: [SablierV2LockupLinear_Approval!]! @derivedFrom(field: "eventsSummary")
+    sablierV2LockupLinear_ApprovalCount: BigInt!
+    sablierV2LockupLinear_ApprovalForAll: [SablierV2LockupLinear_ApprovalForAll!]! @derivedFrom(field: "eventsSummary")
+    sablierV2LockupLinear_ApprovalForAllCount: BigInt!
+    sablierV2LockupLinear_CancelLockupStream: [SablierV2LockupLinear_CancelLockupStream!]! @derivedFrom(field: "eventsSummary")
+    sablierV2LockupLinear_CancelLockupStreamCount: BigInt!
+    sablierV2LockupLinear_CreateLockupLinearStream: [SablierV2LockupLinear_CreateLockupLinearStream!]! @derivedFrom(field: "eventsSummary")
+    sablierV2LockupLinear_CreateLockupLinearStreamCount: BigInt!
+    sablierV2LockupLinear_RenounceLockupStream: [SablierV2LockupLinear_RenounceLockupStream!]! @derivedFrom(field: "eventsSummary")
+    sablierV2LockupLinear_RenounceLockupStreamCount: BigInt!
+    sablierV2LockupLinear_Transfer: [SablierV2LockupLinear_Transfer!]! @derivedFrom(field: "eventsSummary")
+    sablierV2LockupLinear_TransferCount: BigInt!
+    sablierV2LockupLinear_TransferAdmin: [SablierV2LockupLinear_TransferAdmin!]! @derivedFrom(field: "eventsSummary")
+    sablierV2LockupLinear_TransferAdminCount: BigInt!
+    sablierV2LockupLinear_WithdrawFromLockupStream: [SablierV2LockupLinear_WithdrawFromLockupStream!]! @derivedFrom(field: "eventsSummary")
+    sablierV2LockupLinear_WithdrawFromLockupStreamCount: BigInt!
+}
+    type SablierV2LockupLinear_Approval {
+  id: ID!
+      owner: String!
+      approved: String!
+      tokenId: BigInt!
+    eventsSummary: String!
+}
+    type SablierV2LockupLinear_ApprovalForAll {
+  id: ID!
+      owner: String!
+      operator: String!
+      approved: Boolean!
+    eventsSummary: String!
+}
+    type SablierV2LockupLinear_CancelLockupStream {
+  id: ID!
+      streamId: BigInt!
+      sender: String!
+      recipient: String!
+      senderAmount: BigInt!
+      recipientAmount: BigInt!
+    eventsSummary: String!
+}
+    type SablierV2LockupLinear_CreateLockupLinearStream {
+  id: ID!
+      streamId: BigInt!
+      funder: String!
+      sender: String!
+      recipient: String!
+      amounts_0: BigInt!
+      amounts_1: BigInt!
+      amounts_2: BigInt!
+      asset: String!
+      cancelable: Boolean!
+      range_0: BigInt!
+      range_1: BigInt!
+      range_2: BigInt!
+      broker: String!
+    eventsSummary: String!
+}
+    type SablierV2LockupLinear_RenounceLockupStream {
+  id: ID!
+      streamId: BigInt!
+    eventsSummary: String!
+}
+    type SablierV2LockupLinear_Transfer {
+  id: ID!
+      from: String!
+      to: String!
+      tokenId: BigInt!
+    eventsSummary: String!
+}
+    type SablierV2LockupLinear_TransferAdmin {
+  id: ID!
+      oldAdmin: String!
+      newAdmin: String!
+    eventsSummary: String!
+}
+    type SablierV2LockupLinear_WithdrawFromLockupStream {
+  id: ID!
+      streamId: BigInt!
+      to: String!
+      amount: BigInt!
+    eventsSummary: String!
+}
