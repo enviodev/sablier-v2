@@ -91,6 +91,8 @@ SablierV2LockupLinearContract_ApprovalForAll_handler(({ event, context }) => {
 SablierV2LockupLinearContract_CancelLockupStream_loader(
   ({ event, context }) => {
     context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
+    context.Contract.load(event.srcAddress.toString());
+    context.Watcher.load(GLOBAL_WATCHER_ID);
   }
 );
 
@@ -109,8 +111,65 @@ SablierV2LockupLinearContract_CancelLockupStream_handler(
     };
 
     context.EventsSummary.set(nextSummaryEntity);
+    const contract = context.Contract.get(event.srcAddress.toString());
+    const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
+
+    const watcherEntity: WatcherEntity =
+    watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+
+  const contractEntity: ContractEntity =
+    contract ??
+    createContract(
+      event.srcAddress.toString(),
+      event.srcAddress.toString(),
+      "LockupLinear"
+    );
+    
+    let action = createCreateAction(event, watcherEntity, contractEntity)
+
+    //   let action = createAction(event);
+//   action.category = "Cancel";
+//   action.addressA = event.params.sender;
+//   action.addressB = event.params.recipient;
+//   action.amountA = event.params.senderAmount;
+//   action.amountB = event.params.recipientAmount;
+//   /** --------------- */
   }
 );
+
+// export function handleCancel(event: EventCancel): void {
+//   let id = event.params.streamId;
+//   let stream = getStreamByIdFromSource(id);
+//   if (stream == null) {
+//     log.info(
+//       "[SABLIER] Stream hasn't been registered before this cancel event: {}",
+//       [id.toHexString()],
+//     );
+//     log.error("[SABLIER]", []);
+//     return;
+//   }
+
+//   let action = createAction(event);
+//   action.category = "Cancel";
+//   action.addressA = event.params.sender;
+//   action.addressB = event.params.recipient;
+//   action.amountA = event.params.senderAmount;
+//   action.amountB = event.params.recipientAmount;
+//   /** --------------- */
+
+//   stream.cancelable = false;
+//   stream.canceled = true;
+//   stream.canceledAction = action.id;
+//   stream.canceledTime = event.block.timestamp;
+//   stream.intactAmount = event.params.recipientAmount; // The only amount remaining in the stream is the non-withdrawn recipient amount
+
+//   stream.save();
+//   action.stream = stream.id;
+//   action.save();
+// }
+
+
+
 SablierV2LockupLinearContract_CreateLockupLinearStream_loader(
   ({ event, context }) => {
     context.Contract.load(event.srcAddress.toString());

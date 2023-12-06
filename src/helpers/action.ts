@@ -18,7 +18,7 @@ export function generateActionId(event: eventLog<any>): string {
 
 function createAction(
   actionType: string,
-  event: eventLog<any>,
+  event: eventLog<any> | eventLog<any>,
   watcher: WatcherEntity,
   contract: ContractEntity
 ): ActionEntity {
