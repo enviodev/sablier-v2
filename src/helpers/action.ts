@@ -8,7 +8,7 @@ import {
   SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs,
 } from "../src/Types.gen";
 
-import { getChainId } from "./index";
+import { getChainInfoForAddress } from "./index";
 
 export function generateActionId(event: eventLog<any>): string {
   return ""
@@ -31,7 +31,7 @@ function createAction(
     hash: event.transactionHash.toString(),
     timestamp: BigInt(event.blockTimestamp),
     subgraphId: watcher.actionIndex,
-    chainId: getChainId(),
+    chainId: BigInt(getChainInfoForAddress(event.srcAddress).chainId),
     contract: contract.id,
     addressA: "",
     addressB: "",
