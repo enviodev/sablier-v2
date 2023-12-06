@@ -38,7 +38,11 @@ import {
   createLinearStream,
   updateStreamRenounceInfo,
 } from "./helpers/streams";
-import { createWatcher, updateWatcher } from "./helpers/watcher";
+import {
+  createWatcher,
+  updateWatcherActionIndex,
+  updateWatcherStreamIndex,
+} from "./helpers/watcher";
 
 const GLOBAL_EVENTS_SUMMARY_KEY = "GlobalEventsSummary";
 // TODO refactor this into global constants
@@ -166,6 +170,8 @@ SablierV2LockupLinearContract_CancelLockupStream_handler(
 
       context.Stream.set(streamEntity);
     }
+
+    context.Watcher.set(updateWatcherActionIndex(watcherEntity));
   }
 );
 
@@ -216,7 +222,9 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
       updateStreamRenounceInfo(event, newStreamEntity, newActionEntity)
     );
     context.Contract.set(contractEntity);
-    context.Watcher.set(updateWatcher(watcherEntity));
+    context.Watcher.set(
+      updateWatcherActionIndex(updateWatcherStreamIndex(watcherEntity))
+    );
 
     // Create the asset action
 
