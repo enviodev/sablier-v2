@@ -18,8 +18,8 @@ networks:
             requiredEntities:
               - name: Contract
               - name: EventsSummary
-              - name: Watcher
               - name: Stream
+              - name: Watcher
           - event: CreateLockupLinearStream(uint256 streamId, address funder, address indexed sender, address indexed recipient, (uint128,uint128,uint128) amounts, address indexed asset, bool cancelable, (uint40,uint40,uint40) range, address broker)
             requiredEntities:
               - name: Contract
@@ -37,4 +37,7 @@ networks:
               - name: Contract
           - event: WithdrawFromLockupStream(uint256 indexed streamId, address indexed to, uint128 amount)
             requiredEntities:
+              - name: Contract
               - name: EventsSummary
+              - name: Stream
+              - name: Watcher
