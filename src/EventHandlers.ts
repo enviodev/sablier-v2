@@ -27,9 +27,14 @@ import {
   ContractEntity,
 } from "./src/Types.gen";
 
-import { createCreateAction, updateActionStreamInfo } from "./helpers/action";
+import {
+  createCreateAction,
+  createCancelAction,
+  updateActionStreamInfo,
+} from "./helpers/action";
 import { createContract } from "./helpers/contract";
 import {
+  generateStreamId,
   createLinearStream,
   updateStreamRenounceInfo,
 } from "./helpers/streams";
@@ -93,6 +98,9 @@ SablierV2LockupLinearContract_CancelLockupStream_loader(
     context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
     context.Contract.load(event.srcAddress.toString());
     context.Watcher.load(GLOBAL_WATCHER_ID);
+    let streamTokenId = event.params.streamId;
+    let streamId = generateStreamId(event.srcAddress, streamTokenId);
+    context.Stream.load(streamId, {});
   }
 );
 
@@ -115,60 +123,51 @@ SablierV2LockupLinearContract_CancelLockupStream_handler(
     const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
 
     const watcherEntity: WatcherEntity =
-    watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+      watcher ?? createWatcher(GLOBAL_WATCHER_ID);
 
-  const contractEntity: ContractEntity =
-    contract ??
-    createContract(
-      event.srcAddress.toString(),
-      event.srcAddress.toString(),
-      "LockupLinear"
+    const contractEntity: ContractEntity =
+      contract ??
+      createContract(
+        event.srcAddress.toString(),
+        event.srcAddress.toString(),
+        "LockupLinear"
+      );
+
+    let actionPartial = createCancelAction(
+      event,
+      watcherEntity,
+      contractEntity
     );
-    
-    let action = createCreateAction(event, watcherEntity, contractEntity)
 
-    //   let action = createAction(event);
-//   action.category = "Cancel";
-//   action.addressA = event.params.sender;
-//   action.addressB = event.params.recipient;
-//   action.amountA = event.params.senderAmount;
-//   action.amountB = event.params.recipientAmount;
-//   /** --------------- */
+    let streamTokenId = event.params.streamId;
+    let streamId = generateStreamId(event.srcAddress, streamTokenId);
+    let stream = context.Stream.get(streamId);
+
+    let action = { ...actionPartial, stream: streamId.toString() };
+
+    context.Action.set(action);
+
+    if (stream == undefined) {
+      context.log.info(
+        `[SABLIER] Stream hasn't been registered before this cancel event: ${streamId}`
+      );
+      context.log.error(
+        "[SABLIER] - non existent stream, shouldnt be able to cancel a non existent stream"
+      );
+    } else {
+      // Update the stream
+      let streamEntity: StreamEntity = {
+        ...stream,
+        canceled: true,
+        canceledAction: action.id,
+        canceledTime: BigInt(event.blockTimestamp),
+        intactAmount: event.params.recipientAmount, // The only amount remaining in the stream is the non-withdrawn recipient amount
+      };
+
+      context.Stream.set(streamEntity);
+    }
   }
 );
-
-// export function handleCancel(event: EventCancel): void {
-//   let id = event.params.streamId;
-//   let stream = getStreamByIdFromSource(id);
-//   if (stream == null) {
-//     log.info(
-//       "[SABLIER] Stream hasn't been registered before this cancel event: {}",
-//       [id.toHexString()],
-//     );
-//     log.error("[SABLIER]", []);
-//     return;
-//   }
-
-//   let action = createAction(event);
-//   action.category = "Cancel";
-//   action.addressA = event.params.sender;
-//   action.addressB = event.params.recipient;
-//   action.amountA = event.params.senderAmount;
-//   action.amountB = event.params.recipientAmount;
-//   /** --------------- */
-
-//   stream.cancelable = false;
-//   stream.canceled = true;
-//   stream.canceledAction = action.id;
-//   stream.canceledTime = event.block.timestamp;
-//   stream.intactAmount = event.params.recipientAmount; // The only amount remaining in the stream is the non-withdrawn recipient amount
-
-//   stream.save();
-//   action.stream = stream.id;
-//   action.save();
-// }
-
-
 
 SablierV2LockupLinearContract_CreateLockupLinearStream_loader(
   ({ event, context }) => {
