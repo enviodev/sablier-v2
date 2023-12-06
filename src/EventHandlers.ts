@@ -299,9 +299,7 @@ SablierV2LockupLinearContract_RenounceLockupStream_handler(
     }
   
     context.Stream.set(streamEntity)
-  
-
-
+    context.Watcher.set(updateWatcher(watcherEntity));
   }
 );
 SablierV2LockupLinearContract_Transfer_loader(({ event, context }) => {
