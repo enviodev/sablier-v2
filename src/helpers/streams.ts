@@ -7,7 +7,7 @@ import {
   ActionEntity,
 } from "../src/Types.gen";
 
-import { getChainId } from "./index";
+import { getChainInfoForAddress } from "./index";
 
 import { mul, div } from "./maths";
 
@@ -18,7 +18,7 @@ export function generateStreamId(
   let id = ""
     .concat(contractAddress)
     .concat("-")
-    .concat(getChainId().toString())
+    .concat(getChainInfoForAddress(contractAddress).chainId.toString())
     .concat("-")
     .concat(tokenId.toString());
 
@@ -31,7 +31,7 @@ export function generateStreamAlias(
 ): string {
   let id = contract.alias
     .concat("-")
-    .concat(getChainId().toString())
+    .concat(getChainInfoForAddress(contract.id).chainId.toString())
     .concat("-")
     .concat(tokenId.toString());
 
@@ -47,6 +47,7 @@ function createStream(
   let id = generateStreamId(event.srcAddress.toString(), tokenId);
 
   let alias = generateStreamAlias(contract, tokenId);
+  let chainInfo = getChainInfoForAddress(event.srcAddress.toString())
 
   /** --------------- */
   let partialStreamEntity: StreamEntity = {
@@ -57,7 +58,8 @@ function createStream(
     subgraphId: watcher.streamIndex,
     hash: event.transactionHash,
     timestamp: BigInt(event.blockTimestamp),
-    chainId: getChainId(),
+    chainId: BigInt(chainInfo.chainId),
+    chainName: chainInfo.chainName,
     proxied: false,
     canceled: false,
     renounceAction: null,
