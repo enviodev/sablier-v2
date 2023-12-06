@@ -287,9 +287,15 @@ SablierV2LockupLinearContract_Transfer_handler(({ event, context }) => {
 
   context.EventsSummary.set(nextSummaryEntity);
 });
+
+
+
 SablierV2LockupLinearContract_TransferAdmin_loader(({ event, context }) => {
   context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
+  context.Contract.load(event.srcAddress.toString());
 });
+
+
 
 SablierV2LockupLinearContract_TransferAdmin_handler(({ event, context }) => {
   const summary = context.EventsSummary.get(GLOBAL_EVENTS_SUMMARY_KEY);
@@ -304,6 +310,21 @@ SablierV2LockupLinearContract_TransferAdmin_handler(({ event, context }) => {
   };
 
   context.EventsSummary.set(nextSummaryEntity);
+
+let contract = context.Contract.get(event.srcAddress.toString())
+
+if (contract == undefined) {
+  context.log.error("Contract does not exist. Cannot transfer admin to contract that does not exist.")
+  return
+}
+
+let updatedContractEntity = {
+  ...contract,
+  admin: event.params.newAdmin
+}
+
+context.Contract.set(updatedContractEntity)
+
 });
 
 SablierV2LockupLinearContract_WithdrawFromLockupStream_loader(

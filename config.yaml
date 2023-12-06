@@ -34,6 +34,7 @@ networks:
           - event: TransferAdmin(address indexed oldAdmin, address indexed newAdmin)
             requiredEntities:
               - name: EventsSummary
+              - name: Contract
           - event: WithdrawFromLockupStream(uint256 indexed streamId, address indexed to, uint128 amount)
             requiredEntities:
               - name: Contract
