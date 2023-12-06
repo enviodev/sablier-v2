@@ -27,9 +27,14 @@ import {
   ContractEntity,
 } from "./src/Types.gen";
 
-import { createCreateAction, updateActionStreamInfo } from "./helpers/action";
+import {
+  createCreateAction,
+  createCancelAction,
+  updateActionStreamInfo,
+} from "./helpers/action";
 import { createContract } from "./helpers/contract";
 import {
+  generateStreamId,
   createLinearStream,
   updateStreamRenounceInfo,
 } from "./helpers/streams";
@@ -91,6 +96,11 @@ SablierV2LockupLinearContract_ApprovalForAll_handler(({ event, context }) => {
 SablierV2LockupLinearContract_CancelLockupStream_loader(
   ({ event, context }) => {
     context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
+    context.Contract.load(event.srcAddress.toString());
+    context.Watcher.load(GLOBAL_WATCHER_ID);
+    let streamTokenId = event.params.streamId;
+    let streamId = generateStreamId(event.srcAddress, streamTokenId);
+    context.Stream.load(streamId, {});
   }
 );
 
@@ -109,8 +119,56 @@ SablierV2LockupLinearContract_CancelLockupStream_handler(
     };
 
     context.EventsSummary.set(nextSummaryEntity);
+    const contract = context.Contract.get(event.srcAddress.toString());
+    const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
+
+    const watcherEntity: WatcherEntity =
+      watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+
+    const contractEntity: ContractEntity =
+      contract ??
+      createContract(
+        event.srcAddress.toString(),
+        event.srcAddress.toString(),
+        "LockupLinear"
+      );
+
+    let actionPartial = createCancelAction(
+      event,
+      watcherEntity,
+      contractEntity
+    );
+
+    let streamTokenId = event.params.streamId;
+    let streamId = generateStreamId(event.srcAddress, streamTokenId);
+    let stream = context.Stream.get(streamId);
+
+    let action = { ...actionPartial, stream: streamId.toString() };
+
+    context.Action.set(action);
+
+    if (stream == undefined) {
+      context.log.info(
+        `[SABLIER] Stream hasn't been registered before this cancel event: ${streamId}`
+      );
+      context.log.error(
+        "[SABLIER] - non existent stream, shouldnt be able to cancel a non existent stream"
+      );
+    } else {
+      // Update the stream
+      let streamEntity: StreamEntity = {
+        ...stream,
+        canceled: true,
+        canceledAction: action.id,
+        canceledTime: BigInt(event.blockTimestamp),
+        intactAmount: event.params.recipientAmount, // The only amount remaining in the stream is the non-withdrawn recipient amount
+      };
+
+      context.Stream.set(streamEntity);
+    }
   }
 );
+
 SablierV2LockupLinearContract_CreateLockupLinearStream_loader(
   ({ event, context }) => {
     context.Contract.load(event.srcAddress.toString());

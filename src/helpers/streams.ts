@@ -47,7 +47,7 @@ function createStream(
   let id = generateStreamId(event.srcAddress.toString(), tokenId);
 
   let alias = generateStreamAlias(contract, tokenId);
-  let chainInfo = getChainInfoForAddress(event.srcAddress.toString())
+  let chainInfo = getChainInfoForAddress(event.srcAddress.toString());
 
   let partialStreamEntity: StreamEntity = {
     id: id,
@@ -64,7 +64,6 @@ function createStream(
     sender: event.params.sender,
     proxender: "",
     chainId: BigInt(chainInfo.chainId),
-    chainName: chainInfo.chainName,
     proxied: false,
     cliff: false,
     asset: event.params.asset,

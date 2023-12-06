@@ -5,9 +5,10 @@ import {
   ActionEntity,
   WatcherEntity,
   SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
+  SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs,
 } from "../src/Types.gen";
 
-import { getChainId } from "./index";
+import { getChainInfoForAddress } from "./index";
 
 export function generateActionId(event: eventLog<any>): string {
   return ""
@@ -18,7 +19,7 @@ export function generateActionId(event: eventLog<any>): string {
 
 function createAction(
   actionType: string,
-  event: eventLog<any>,
+  event: eventLog<any> | eventLog<any>,
   watcher: WatcherEntity,
   contract: ContractEntity
 ): ActionEntity {
@@ -30,7 +31,7 @@ function createAction(
     hash: event.transactionHash.toString(),
     timestamp: BigInt(event.blockTimestamp),
     subgraphId: watcher.actionIndex,
-    chainId: getChainId(),
+    chainId: BigInt(getChainInfoForAddress(event.srcAddress).chainId),
     contract: contract.id,
     addressA: "",
     addressB: "",
@@ -57,10 +58,34 @@ export function createCreateAction(
 
   let actionEntity: ActionEntity = {
     ...partialActionEntity,
-    category: "Create",
     addressA: event.params.sender,
     addressB: event.params.recipient,
     amountA: event.params.amounts[0],
+  };
+
+  return actionEntity;
+}
+
+export function createCancelAction(
+  event: eventLog<SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs>,
+  watcher: WatcherEntity,
+  contract: ContractEntity
+): ActionEntity {
+  let partialActionEntity: ActionEntity = createAction(
+    "Cancel",
+    event,
+    watcher,
+    contract
+  );
+
+  /** --------------- */
+
+  let actionEntity: ActionEntity = {
+    ...partialActionEntity,
+    addressA: event.params.sender,
+    addressB: event.params.recipient,
+    amountA: event.params.senderAmount,
+    amountB: event.params.recipientAmount,
   };
 
   return actionEntity;

@@ -16,7 +16,10 @@ networks:
               - name: EventsSummary
           - event: CancelLockupStream(uint256 indexed streamId, address indexed sender, address indexed recipient, uint128 senderAmount, uint128 recipientAmount)
             requiredEntities:
+              - name: Contract
               - name: EventsSummary
+              - name: Watcher
+              - name: Stream
           - event: CreateLockupLinearStream(uint256 streamId, address funder, address indexed sender, address indexed recipient, (uint128,uint128,uint128) amounts, address indexed asset, bool cancelable, (uint40,uint40,uint40) range, address broker)
             requiredEntities:
               - name: Contract

@@ -95,8 +95,6 @@ type Stream {
   category: String!
   "hardcoded chain id"
   chainId: BigInt!
-  "hardcoded chain name"
-  chainName: String!
   "contract through which this stream has been created"
   contract: Contract!
   "transaction hash for the stream creation"
