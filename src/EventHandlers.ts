@@ -31,6 +31,7 @@ import {
   createCreateAction,
   createCancelAction,
   updateActionStreamInfo,
+  createRenounceAction,
 } from "./helpers/action";
 import { createContract } from "./helpers/contract";
 import {
@@ -239,12 +240,30 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
 SablierV2LockupLinearContract_RenounceLockupStream_loader(
   ({ event, context }) => {
     context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
+    let streamTokenId = event.params.streamId;
+    let streamId = generateStreamId(event.srcAddress, streamTokenId);
+    context.Stream.load(streamId, {});
+    context.Contract.load(event.srcAddress.toString());
+    context.Watcher.load(GLOBAL_WATCHER_ID);
   }
 );
 
 SablierV2LockupLinearContract_RenounceLockupStream_handler(
   ({ event, context }) => {
+    const contract = context.Contract.get(event.srcAddress.toString());
     const summary = context.EventsSummary.get(GLOBAL_EVENTS_SUMMARY_KEY);
+    const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
+
+    const watcherEntity: WatcherEntity =
+      watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+
+    const contractEntity: ContractEntity =
+      contract ??
+      createContract(
+        event.srcAddress.toString(),
+        event.srcAddress.toString(),
+        "LockupLinear"
+      );
 
     const currentSummaryEntity: EventsSummaryEntity =
       summary ?? INITIAL_EVENTS_SUMMARY;
@@ -257,6 +276,32 @@ SablierV2LockupLinearContract_RenounceLockupStream_handler(
     };
 
     context.EventsSummary.set(nextSummaryEntity);
+
+    let streamTokenId = event.params.streamId;
+    let streamId = generateStreamId(event.srcAddress, streamTokenId);
+    let stream = context.Stream.get(streamId);
+
+    if (stream == undefined) {
+      return;
+    }
+  
+    let action = createRenounceAction(event, watcherEntity, contractEntity);
+  
+    context.Action.set(
+      updateActionStreamInfo(stream, action)
+    );
+
+    let streamEntity = {
+        ...stream,
+        cancelable : false,
+        renounceAction : action.id,
+        renounceTime : BigInt(event.blockTimestamp),
+    }
+  
+    context.Stream.set(streamEntity)
+  
+
+
   }
 );
 SablierV2LockupLinearContract_Transfer_loader(({ event, context }) => {
