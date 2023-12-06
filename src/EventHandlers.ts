@@ -29,6 +29,7 @@ import {
   createRenounceAction,
   createWithdrawAction,
   createApprovalAction,
+  createApprovalForAllAction,
 } from "./helpers/action";
 import { createContract } from "./helpers/contract";
 import {
@@ -82,35 +83,35 @@ SablierV2LockupLinearContract_Approval_handler(({ event, context }) => {
   context.Watcher.set(updateWatcherActionIndex(watcherEntity));
 });
 
-// export function handleApproval(event: EventApproval): void {
-//   let id = event.params.tokenId;
-//   let stream = getStreamByIdFromSource(id);
 
-//   if (stream == null) {
-//     log.info(
-//       "[SABLIER] Stream hasn't been registered before this approval event: {}",
-//       [id.toHexString()],
-//     );
-//     return;
-//   }
-
-//   let action = createAction(event);
-//   action.category = "Approval";
-
-//   action.addressA = event.params.owner;
-//   action.addressB = event.params.approved;
-
-//   /** --------------- */
-
-//   action.stream = stream.id;
-//   action.save();
-// }
-
-SablierV2LockupLinearContract_ApprovalForAll_loader(({ event, context }) => {});
+SablierV2LockupLinearContract_ApprovalForAll_loader(({ event, context }) => {
+  context.Watcher.load(GLOBAL_WATCHER_ID);
+});
 
 SablierV2LockupLinearContract_ApprovalForAll_handler(
-  ({ event, context }) => {}
+  ({ event, context }) => {
+
+    const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
+
+    const watcherEntity: WatcherEntity =
+      watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+  
+    let action = createApprovalForAllAction(
+      event,
+      watcherEntity,
+      event.srcAddress.toString()
+    );
+
+  
+    context.Action.set(action);
+  
+    context.Watcher.set(updateWatcherActionIndex(watcherEntity));
+
+  }
 );
+
+
+
 SablierV2LockupLinearContract_CancelLockupStream_loader(
   ({ event, context }) => {
     context.Watcher.load(GLOBAL_WATCHER_ID);
