@@ -24,7 +24,6 @@ networks:
             requiredEntities:
               - name: Stream
               - name: Watcher
-              - name: Contract
           - event: Transfer(address indexed from, address indexed to, uint256 indexed tokenId)
             requiredEntities: []
           - event: TransferAdmin(address indexed oldAdmin, address indexed newAdmin)

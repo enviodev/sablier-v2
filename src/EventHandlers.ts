@@ -163,26 +163,16 @@ SablierV2LockupLinearContract_RenounceLockupStream_loader(
     let streamTokenId = event.params.streamId;
     let streamId = generateStreamId(event.srcAddress, streamTokenId);
     context.Stream.load(streamId, {});
-    context.Contract.load(event.srcAddress.toString());
     context.Watcher.load(GLOBAL_WATCHER_ID);
   }
 );
 
 SablierV2LockupLinearContract_RenounceLockupStream_handler(
   ({ event, context }) => {
-    const contract = context.Contract.get(event.srcAddress.toString());
     const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
 
     const watcherEntity: WatcherEntity =
       watcher ?? createWatcher(GLOBAL_WATCHER_ID);
-
-    const contractEntity: ContractEntity =
-      contract ??
-      createContract(
-        event.srcAddress.toString(),
-        event.srcAddress.toString(),
-        "LockupLinear"
-      );
 
     let streamTokenId = event.params.streamId;
     let streamId = generateStreamId(event.srcAddress, streamTokenId);
@@ -192,7 +182,11 @@ SablierV2LockupLinearContract_RenounceLockupStream_handler(
       return;
     }
 
-    let action = createRenounceAction(event, watcherEntity, contractEntity.id);
+    let action = createRenounceAction(
+      event,
+      watcherEntity,
+      event.srcAddress.toString()
+    );
 
     context.Action.set(updateActionStreamInfo(stream.id, action));
 
@@ -218,15 +212,16 @@ SablierV2LockupLinearContract_TransferAdmin_loader(({ event, context }) => {
 SablierV2LockupLinearContract_TransferAdmin_handler(({ event, context }) => {
   let contract = context.Contract.get(event.srcAddress.toString());
 
-  if (contract == undefined) {
-    context.log.error(
-      "Contract does not exist. Cannot transfer admin to contract that does not exist."
+  const contractEntity: ContractEntity =
+    contract ??
+    createContract(
+      event.srcAddress.toString(),
+      event.srcAddress.toString(),
+      "LockupLinear"
     );
-    return;
-  }
 
   let updatedContractEntity = {
-    ...contract,
+    ...contractEntity,
     admin: event.params.newAdmin,
   };
 
