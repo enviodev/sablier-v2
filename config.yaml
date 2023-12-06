@@ -9,9 +9,12 @@ networks:
         handler: src/EventHandlers.ts
         events:
           - event: Approval(address indexed owner, address indexed approved, uint256 indexed tokenId)
-            requiredEntities: []
+            requiredEntities:
+              - name: Watcher
+              - name: Stream
           - event: ApprovalForAll(address indexed owner, address indexed operator, bool approved)
-            requiredEntities: []
+            requiredEntities:
+              - name: Watcher
           - event: CancelLockupStream(uint256 indexed streamId, address indexed sender, address indexed recipient, uint128 senderAmount, uint128 recipientAmount)
             requiredEntities:
               - name: Stream
