@@ -20,9 +20,20 @@ import {
   SablierV2LockupLinearContract_WithdrawFromLockupStream_handler,
 } from "../generated/src/Handlers.gen";
 
-import { EventsSummaryEntity } from "./src/Types.gen";
+import {
+  EventsSummaryEntity,
+  StreamEntity,
+  WatcherEntity,
+  ContractEntity,
+} from "./src/Types.gen";
+
+import { createWatcher } from "./helpers/watcher";
+import { createContract } from "./helpers/contract";
+import { createLinearStream } from "./helpers/streams";
 
 const GLOBAL_EVENTS_SUMMARY_KEY = "GlobalEventsSummary";
+// TODO refactor this into global constants
+const GLOBAL_WATCHER_ID = "1";
 
 const INITIAL_EVENTS_SUMMARY: EventsSummaryEntity = {
   id: GLOBAL_EVENTS_SUMMARY_KEY,
@@ -98,14 +109,55 @@ SablierV2LockupLinearContract_CancelLockupStream_handler(
 );
 SablierV2LockupLinearContract_CreateLockupLinearStream_loader(
   ({ event, context }) => {
+    context.Contract.load(event.srcAddress.toString());
     context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
+    context.Watcher.load(GLOBAL_WATCHER_ID);
   }
 );
 
 SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
   ({ event, context }) => {
+    const contract = context.Contract.get(event.srcAddress.toString());
     const summary = context.EventsSummary.get(GLOBAL_EVENTS_SUMMARY_KEY);
+    const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
 
+    const watcherEntity: WatcherEntity =
+      watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+
+    const contractEntity: ContractEntity =
+      contract ??
+      createContract(
+        event.srcAddress.toString(),
+        event.srcAddress.toString(),
+        "LockupLinear"
+      );
+
+    // Create the stream entity
+    let newStreamEntity: StreamEntity = createLinearStream(
+      event,
+      watcherEntity,
+      contractEntity
+    );
+
+    context.Stream.set(newStreamEntity);
+    context.Contract.set(contractEntity);
+    context.Watcher.set(watcherEntity);
+
+    // Create the action entity
+
+    // Create the asset action
+
+    // Save stream
+
+    // Save action
+
+    // Save the asset
+
+    // Update Watcher
+    /** --------------- */
+
+    // watcher.streamIndex = watcher.streamIndex.plus(1);
+    // watcher.save();
     const currentSummaryEntity: EventsSummaryEntity =
       summary ?? INITIAL_EVENTS_SUMMARY;
 
@@ -119,6 +171,7 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
     context.EventsSummary.set(nextSummaryEntity);
   }
 );
+
 SablierV2LockupLinearContract_RenounceLockupStream_loader(
   ({ event, context }) => {
     context.EventsSummary.load(GLOBAL_EVENTS_SUMMARY_KEY);
