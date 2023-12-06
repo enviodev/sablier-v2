@@ -16,7 +16,6 @@ networks:
               - name: EventsSummary
           - event: CancelLockupStream(uint256 indexed streamId, address indexed sender, address indexed recipient, uint128 senderAmount, uint128 recipientAmount)
             requiredEntities:
-              - name: Contract
               - name: EventsSummary
               - name: Stream
               - name: Watcher
@@ -37,7 +36,6 @@ networks:
               - name: Contract
           - event: WithdrawFromLockupStream(uint256 indexed streamId, address indexed to, uint128 amount)
             requiredEntities:
-              - name: Contract
               - name: EventsSummary
               - name: Stream
               - name: Watcher
