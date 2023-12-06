@@ -4,6 +4,7 @@ import {
   eventLog,
   SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
   WatcherEntity,
+  ActionEntity,
 } from "../src/Types.gen";
 
 import { getChainId } from "./index";
@@ -137,4 +138,22 @@ export function createLinearStream(
   //   let resolved = bindProxyOwner(entity);
 
   return streamEntity;
+}
+
+export function updateStreamRenounceInfo(
+  event: eventLog<any>,
+  stream: StreamEntity,
+  action: ActionEntity
+): StreamEntity {
+  if (stream.cancelable == false) {
+    let renounceAction = action.id;
+    let renounceTime = BigInt(event.blockTimestamp);
+    let streamEntity: StreamEntity = {
+      ...stream,
+    };
+
+    return streamEntity;
+  } else {
+    return stream;
+  }
 }

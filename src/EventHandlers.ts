@@ -27,9 +27,13 @@ import {
   ContractEntity,
 } from "./src/Types.gen";
 
-import { createWatcher } from "./helpers/watcher";
+import { createCreateAction, updateActionStreamInfo } from "./helpers/action";
 import { createContract } from "./helpers/contract";
-import { createLinearStream } from "./helpers/streams";
+import {
+  createLinearStream,
+  updateStreamRenounceInfo,
+} from "./helpers/streams";
+import { createWatcher } from "./helpers/watcher";
 
 const GLOBAL_EVENTS_SUMMARY_KEY = "GlobalEventsSummary";
 // TODO refactor this into global constants
@@ -139,11 +143,24 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
       contractEntity
     );
 
-    context.Stream.set(newStreamEntity);
+    // Create the action entity
+    let newActionEntity = createCreateAction(
+      event,
+      watcherEntity,
+      contractEntity
+    );
+
+    context.Action.set(
+      updateActionStreamInfo(newStreamEntity, newActionEntity)
+    );
+    context.Stream.set(
+      updateStreamRenounceInfo(event, newStreamEntity, newActionEntity)
+    );
     context.Contract.set(contractEntity);
     context.Watcher.set(watcherEntity);
 
-    // Create the action entity
+    // watcher.actionIndex = watcher.actionIndex.plus(one);
+    // watcher.save();
 
     // Create the asset action
 
