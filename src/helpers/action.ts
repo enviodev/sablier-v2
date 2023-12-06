@@ -6,6 +6,7 @@ import {
   WatcherEntity,
   SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
   SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs,
+  SablierV2LockupLinearContract_RenounceLockupStreamEvent_eventArgs,
   SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
 } from "../src/Types.gen";
 
@@ -91,6 +92,22 @@ export function createCancelAction(
 
   return actionEntity;
 }
+
+export function createRenounceAction(
+  event: eventLog<SablierV2LockupLinearContract_RenounceLockupStreamEvent_eventArgs>,
+  watcher: WatcherEntity,
+  contract: ContractEntity
+): ActionEntity {
+  let actionEntity: ActionEntity = createAction(
+    "Renounce",
+    event,
+    watcher,
+    contract
+  );
+    return actionEntity;
+}
+
+
 
 export function createWithdrawAction(
   event: eventLog<SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs>,
