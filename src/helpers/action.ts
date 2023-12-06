@@ -6,6 +6,7 @@ import {
   WatcherEntity,
   SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
   SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs,
+  SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";
@@ -91,12 +92,34 @@ export function createCancelAction(
   return actionEntity;
 }
 
+export function createWithdrawAction(
+  event: eventLog<SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs>,
+  watcher: WatcherEntity,
+  contract: ContractEntity
+): ActionEntity {
+  let partialActionEntity: ActionEntity = createAction(
+    "Withdraw",
+    event,
+    watcher,
+    contract
+  );
+
+  let actionEntity: ActionEntity = {
+    ...partialActionEntity,
+    addressA: event.srcAddress.toString(),
+    addressB: event.params.to,
+    amountB: event.params.amount,
+  };
+
+  return actionEntity;
+}
+
 export function updateActionStreamInfo(
-  stream: StreamEntity,
+  streamId: string,
   action: ActionEntity
 ): ActionEntity {
   return {
     ...action,
-    stream: stream.id,
+    stream: streamId,
   };
 }
