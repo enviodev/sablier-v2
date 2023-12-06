@@ -347,10 +347,10 @@ SablierV2LockupLinearContract_WithdrawFromLockupStream_handler(
 
     if (stream == undefined) {
       context.log.info(
-        `[SABLIER] Stream hasn't been registered before this cancel event: ${streamId}`
+        `[SABLIER] Stream hasn't been registered before this withdraw event: ${streamId}`
       );
       context.log.error(
-        "[SABLIER] - non existent stream, shouldnt be able to cancel a non existent stream"
+        "[SABLIER] - non existent stream, shouldnt be able to withdraw from a non existent stream"
       );
     } else {
       context.Stream.set(updateStreamWithdrawalInfo(event, stream));

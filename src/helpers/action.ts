@@ -115,8 +115,8 @@ export function createWithdrawAction(
 }
 
 export function updateActionStreamInfo(
-  action: ActionEntity,
-  streamId: string
+  streamId: string,
+  action: ActionEntity
 ): ActionEntity {
   return {
     ...action,
