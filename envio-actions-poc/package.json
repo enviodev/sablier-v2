@@ -1,0 +1,19 @@
+{
+  "name": "actions-experiment",
+  "version": "0.1.0",
+  "scripts": {
+    "codegen": "envio codegen",
+    "dev": "envio dev",
+    "start": "node generated/src/Index.bs.js",
+    "send": "node src/rabbitmq-testing/send.js",
+    "receiver": "node src/rabbitmq-testing/receiver.js"
+
+  },
+  "devDependencies": {
+    "rescript": "10.1.4"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.3",
+    "envio": "0.0.25"
+  }
+}
