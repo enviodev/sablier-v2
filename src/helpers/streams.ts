@@ -145,20 +145,31 @@ export function createLinearStream(
   return streamEntity;
 }
 
+export function updateStreamCancelInfo(
+  event: eventLog<any>,
+  stream: StreamEntity,
+  action: ActionEntity
+): StreamEntity {
+  return {
+    ...stream,
+    canceled: true,
+    canceledAction: action.id,
+    canceledTime: BigInt(event.blockTimestamp),
+    intactAmount: event.params.recipientAmount, // The only amount remaining in the stream is the non-withdrawn recipient amount
+  };
+}
+
 export function updateStreamRenounceInfo(
   event: eventLog<any>,
   stream: StreamEntity,
   action: ActionEntity
 ): StreamEntity {
-  if (stream.cancelable == false) {
-    return {
-      ...stream,
-      renounceAction: action.id,
-      renounceTime: BigInt(event.blockTimestamp),
-    };
-  } else {
-    return stream;
-  }
+  return {
+    ...stream,
+    cancelable: false,
+    renounceAction: action.id,
+    renounceTime: BigInt(event.blockTimestamp),
+  };
 }
 
 export function updateStreamTransferInfo(
