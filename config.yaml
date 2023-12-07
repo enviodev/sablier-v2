@@ -47,15 +47,14 @@ networks:
         address:
           - 0xB10daee1FCF62243aE27776D7a92D39dC8740f95
           - 0x39EFdC3dbB57B2388CcC4bb40aC4CB1226Bc9E44
-  # - id: 42161 # Arbitrum
-  #   start_block: 0
-  #   contracts:
-  #     - name: SablierV2LockupLinear
-  #       address:
-  #         - 0x197D655F3be03903fD25e7828c3534504bfe525e
-  #     # - name: SablierV2LockupDynamic
-  #     #   address:
-  #     #     - 0xA9EfBEf1A35fF80041F567391bdc9813b2D50197
+  - id: 42161 # Arbitrum
+    start_block: 0
+    contracts:
+      - name: SablierV2Lockup
+        address:
+          - 0x197D655F3be03903fD25e7828c3534504bfe525e
+          - 0xA9EfBEf1A35fF80041F567391bdc9813b2D50197
+
   # - id: 43114 # Avalanche
   #   start_block: 0
   #   contracts:

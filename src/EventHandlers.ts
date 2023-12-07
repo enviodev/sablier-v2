@@ -140,12 +140,19 @@ SablierV2LockupContract_CancelLockupStream_loader(({ event, context }) => {
 });
 
 SablierV2LockupContract_CancelLockupStream_handler(({ event, context }) => {
-  const watcher = context.Watcher.get(
-    getChainInfoForAddress(event.srcAddress).chainId.toString()
-  );
-
   // proxy for if the indexer is live indexing
-  if (event.blockTimestamp > indexerStartTimestamp) {
+
+  if (event.blockNumber == 50854904) {
+    context.log.info("The block log");
+  }
+
+  // if (event.blockTimestamp > indexerStartTimestamp) {
+  if (
+    event.transactionHash.toLowerCase() ==
+    "0x5a1d1ebd509fce257ca0291f35253a1cfbe241ce5dd6e9d582ac47065a23708c"
+  ) {
+    context.log.debug("The log debug");
+
     context.log.info("Sending message to queue");
     sendMessageToQueue(
       `Stream was cancelled \n tx: ${event.transactionHash} \n sender: ${
@@ -157,6 +164,10 @@ SablierV2LockupContract_CancelLockupStream_handler(({ event, context }) => {
       } \n chainId: ${getChainInfoForAddress(event.srcAddress).chainId} `
     );
   }
+
+  const watcher = context.Watcher.get(
+    getChainInfoForAddress(event.srcAddress).chainId.toString()
+  );
 
   const watcherEntity: WatcherEntity =
     watcher ??
