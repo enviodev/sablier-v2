@@ -1,10 +1,14 @@
 import { WatcherEntity } from "../src/Types.gen";
 
-export function createWatcher(watcher_id: string): WatcherEntity {
+import { getChainInfoForAddress } from "./index";
+
+export function createWatcher(
+  watcherId: string,
+  contractAddress: string
+): WatcherEntity {
   const watcherEntity: WatcherEntity = {
-    id: watcher_id,
-    // TODO update this to use event.srcAddress and the helper function
-    chainId: 1n,
+    id: watcherId,
+    chainId: BigInt(getChainInfoForAddress(contractAddress).chainId),
     streamIndex: 1n,
     actionIndex: 1n,
     initialized: false,

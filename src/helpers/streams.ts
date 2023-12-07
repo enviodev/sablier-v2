@@ -7,6 +7,7 @@ import {
   SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
   SablierV2LockupLinearContract_TransferEvent_eventArgs,
   SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
+  AssetEntity,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";
@@ -97,7 +98,8 @@ function createStream(
 export function createLinearStream(
   event: eventLog<SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs>,
   watcher: WatcherEntity,
-  contract: ContractEntity
+  contract: ContractEntity,
+  asset: AssetEntity
 ): StreamEntity {
   let tokenId = event.params.streamId;
   let partialStreamEntity: StreamEntity = createStream(
@@ -133,7 +135,7 @@ export function createLinearStream(
     parties: [event.params.sender, event.params.recipient],
     cancelable: event.params.cancelable,
     duration: duration,
-    asset: event.params.asset,
+    asset: asset.id,
     cliff: cliff,
     cliffAmount: cliffAmount,
     cliffTime: cliffTime,
