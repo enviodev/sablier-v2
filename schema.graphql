@@ -22,6 +22,10 @@ type Contract {
   alias: String!
   "address of the contract"
   address: Bytes!
+  "chain id of the contract"
+  chainId: BigInt!
+  "Name of the chain"
+  chainName: String!
   "address of the contract admin"
   admin: Bytes
   "category of contract e.g. LockupLinear or LockupDynamic"
