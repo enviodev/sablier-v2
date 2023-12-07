@@ -21,10 +21,9 @@ import {
 import { generateActionId } from "../src/helpers/action";
 import { generateStreamId } from "../src/helpers/streams";
 import { getChainInfoForAddress } from "../src/helpers/index";
-import { GLOBAL_WATCHER_ID } from "../src/EventHandlers";
 
 const defaultWatcherEntity: watcherEntity = {
-  id: GLOBAL_WATCHER_ID,
+  id: "0",
   chainId: 1n,
   streamIndex: 1n,
   actionIndex: 1n,
@@ -164,6 +163,6 @@ describe("Sablier V2 Linear Lockup Stream Tests", () => {
     let actualAssetEntity = updatedMockDb.entities.Asset.get(assetId);
 
     // Asserting that the entity in the mock database is the same as the expected entity
-    expect(expectedAssetEntity).to.deep.equal(actualAssetEntity);
+    expect(expectedAssetEntity).to.equal(actualAssetEntity);
   });
 });
