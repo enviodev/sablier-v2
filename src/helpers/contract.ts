@@ -1,7 +1,7 @@
 import {
   eventLog,
   ContractEntity,
-  SablierV2LockupLinearContract_TransferAdminEvent_eventArgs,
+  SablierV2LockupContract_TransferAdminEvent_eventArgs,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";
@@ -28,7 +28,7 @@ export function createContract(
 }
 
 export function upgradeContractAdminInfo(
-  event: eventLog<SablierV2LockupLinearContract_TransferAdminEvent_eventArgs>,
+  event: eventLog<SablierV2LockupContract_TransferAdminEvent_eventArgs>,
   contractEntity: ContractEntity
 ): ContractEntity {
   return {

@@ -4,9 +4,9 @@ import {
   ContractEntity,
   StreamEntity,
   WatcherEntity,
+  SablierV2LockupContract_TransferEvent_eventArgs,
+  SablierV2LockupContract_WithdrawFromLockupStreamEvent_eventArgs,
   SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
-  SablierV2LockupLinearContract_TransferEvent_eventArgs,
-  SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
   AssetEntity,
 } from "../src/Types.gen";
 
@@ -175,7 +175,7 @@ export function updateStreamRenounceInfo(
 }
 
 export function updateStreamTransferInfo(
-  event: eventLog<SablierV2LockupLinearContract_TransferEvent_eventArgs>,
+  event: eventLog<SablierV2LockupContract_TransferEvent_eventArgs>,
   stream: StreamEntity
 ): StreamEntity {
   let recipient = event.params.to;
@@ -196,7 +196,7 @@ export function updateStreamTransferInfo(
 }
 
 export function updateStreamWithdrawalInfo(
-  event: eventLog<SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs>,
+  event: eventLog<SablierV2LockupContract_WithdrawFromLockupStreamEvent_eventArgs>,
   stream: StreamEntity
 ): StreamEntity {
   let amount = event.params.amount;

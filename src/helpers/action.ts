@@ -2,13 +2,13 @@ import {
   eventLog,
   ActionEntity,
   WatcherEntity,
-  SablierV2LockupLinearContract_ApprovalEvent_eventArgs,
-  SablierV2LockupLinearContract_ApprovalForAllEvent_eventArgs,
-  SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs,
+  SablierV2LockupContract_ApprovalEvent_eventArgs,
+  SablierV2LockupContract_ApprovalForAllEvent_eventArgs,
+  SablierV2LockupContract_CancelLockupStreamEvent_eventArgs,
+  SablierV2LockupContract_RenounceLockupStreamEvent_eventArgs,
+  SablierV2LockupContract_TransferEvent_eventArgs,
+  SablierV2LockupContract_WithdrawFromLockupStreamEvent_eventArgs,
   SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
-  SablierV2LockupLinearContract_RenounceLockupStreamEvent_eventArgs,
-  SablierV2LockupLinearContract_TransferEvent_eventArgs,
-  SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";
@@ -47,7 +47,7 @@ function createAction(
   return actionEntity;
 }
 export function createApprovalAction(
-  event: eventLog<SablierV2LockupLinearContract_ApprovalEvent_eventArgs>,
+  event: eventLog<SablierV2LockupContract_ApprovalEvent_eventArgs>,
   watcher: WatcherEntity,
   contract_address: string
 ): ActionEntity {
@@ -68,7 +68,7 @@ export function createApprovalAction(
 }
 
 export function createApprovalForAllAction(
-  event: eventLog<SablierV2LockupLinearContract_ApprovalForAllEvent_eventArgs>,
+  event: eventLog<SablierV2LockupContract_ApprovalForAllEvent_eventArgs>,
   watcher: WatcherEntity,
   contract_address: string
 ): ActionEntity {
@@ -90,7 +90,7 @@ export function createApprovalForAllAction(
 }
 
 export function createCancelAction(
-  event: eventLog<SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs>,
+  event: eventLog<SablierV2LockupContract_CancelLockupStreamEvent_eventArgs>,
   watcher: WatcherEntity,
   contract_address: string
 ): ActionEntity {
@@ -135,7 +135,7 @@ export function createCreateAction(
 }
 
 export function createRenounceAction(
-  event: eventLog<SablierV2LockupLinearContract_RenounceLockupStreamEvent_eventArgs>,
+  event: eventLog<SablierV2LockupContract_RenounceLockupStreamEvent_eventArgs>,
   watcher: WatcherEntity,
   contractAddress: string
 ): ActionEntity {
@@ -149,7 +149,7 @@ export function createRenounceAction(
 }
 
 export function createTransferAction(
-  event: eventLog<SablierV2LockupLinearContract_TransferEvent_eventArgs>,
+  event: eventLog<SablierV2LockupContract_TransferEvent_eventArgs>,
   watcher: WatcherEntity,
   contractAddress: string
 ): ActionEntity {
@@ -170,7 +170,7 @@ export function createTransferAction(
 }
 
 export function createWithdrawAction(
-  event: eventLog<SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs>,
+  event: eventLog<SablierV2LockupContract_WithdrawFromLockupStreamEvent_eventArgs>,
   watcher: WatcherEntity,
   contract_address: string
 ): ActionEntity {
