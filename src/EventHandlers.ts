@@ -267,9 +267,10 @@ SablierV2LockupLinearContract_Transfer_handler(({ event, context }) => {
   let streamId = generateStreamId(event.srcAddress, streamTokenId);
   let stream = context.Stream.get(streamId);
 
-  // it always goes into this if condition here because the Transfer event seems to be emitted before CreateLockupLinearStream event for the same stream
-  // TODO investigate this further
-  if (stream == undefined) {
+  if (
+    stream == undefined &&
+    event.params.from != "0x0000000000000000000000000000000000000000"
+  ) {
     context.log.info(
       `[SABLIER] Stream hasn't been registered before this Transfer event: ${streamId}, ${event.transactionHash}`
     );
@@ -284,7 +285,9 @@ SablierV2LockupLinearContract_Transfer_handler(({ event, context }) => {
     );
 
     context.Action.set(actionEntity);
-    context.Stream.set(updateStreamTransferInfo(event, stream));
+    if (stream != undefined) {
+      context.Stream.set(updateStreamTransferInfo(event, stream));
+    }
   }
 
   context.Watcher.set(updateWatcherActionIndex(watcherEntity));
