@@ -47,7 +47,7 @@ import {
 } from "./helpers/watcher";
 
 // TODO refactor this into global constants
-const GLOBAL_WATCHER_ID = "1";
+export const GLOBAL_WATCHER_ID = "1";
 
 SablierV2LockupLinearContract_Approval_loader(({ event, context }) => {
   context.Watcher.load(GLOBAL_WATCHER_ID);
