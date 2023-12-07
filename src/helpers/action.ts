@@ -8,6 +8,7 @@ import {
   SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs,
   SablierV2LockupLinearContract_RenounceLockupStreamEvent_eventArgs,
   SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
+  SablierV2LockupLinearContract_TransferEvent_eventArgs,
   SablierV2LockupLinearContract_ApprovalEvent_eventArgs,
   SablierV2LockupLinearContract_ApprovalForAllEvent_eventArgs,
 } from "../src/Types.gen";
@@ -82,8 +83,6 @@ export function createCancelAction(
     contract_address
   );
 
-  /** --------------- */
-
   let actionEntity: ActionEntity = {
     ...partialActionEntity,
     addressA: event.params.sender,
@@ -106,6 +105,27 @@ export function createRenounceAction(
     watcher,
     contractAddress
   );
+  return actionEntity;
+}
+
+export function createTransferAction(
+  event: eventLog<SablierV2LockupLinearContract_TransferEvent_eventArgs>,
+  watcher: WatcherEntity,
+  contractAddress: string
+): ActionEntity {
+  let partialActionEntity: ActionEntity = createAction(
+    "Transfer",
+    event,
+    watcher,
+    contractAddress
+  );
+
+  let actionEntity: ActionEntity = {
+    ...partialActionEntity,
+    addressA: event.params.from,
+    addressB: event.params.to,
+  };
+
   return actionEntity;
 }
 

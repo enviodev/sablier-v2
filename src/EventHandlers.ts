@@ -20,22 +20,24 @@ import {
   SablierV2LockupLinearContract_WithdrawFromLockupStream_handler,
 } from "../generated/src/Handlers.gen";
 
-import { StreamEntity, WatcherEntity, ContractEntity } from "./src/Types.gen";
+import { ContractEntity, StreamEntity, WatcherEntity } from "./src/Types.gen";
 
 import {
-  createCreateAction,
-  createCancelAction,
   updateActionStreamInfo,
+  createCancelAction,
+  createCreateAction,
   createRenounceAction,
+  createTransferAction,
   createWithdrawAction,
   createApprovalAction,
   createApprovalForAllAction,
 } from "./helpers/action";
 import { createContract } from "./helpers/contract";
 import {
-  generateStreamId,
   createLinearStream,
+  generateStreamId,
   updateStreamRenounceInfo,
+  updateStreamTransferInfo,
   updateStreamWithdrawalInfo,
 } from "./helpers/streams";
 import {
@@ -147,7 +149,7 @@ SablierV2LockupLinearContract_CancelLockupStream_handler(
         `[SABLIER] Stream hasn't been registered before this cancel event: ${streamId}`
       );
       context.log.error(
-        "[SABLIER] - non existent stream, shouldnt be able to cancel a non existent stream"
+        "[SABLIER] - non existent stream, shouldn't be able to cancel a non existent stream"
       );
     } else {
       // Update the stream
@@ -238,31 +240,72 @@ SablierV2LockupLinearContract_RenounceLockupStream_handler(
     let stream = context.Stream.get(streamId);
 
     if (stream == undefined) {
-      return;
-    }
+      context.log.info(
+        `[SABLIER] Stream hasn't been registered before this cancel event: ${streamId}`
+      );
+      context.log.error(
+        "[SABLIER] - non existent stream, shouldn't be able to cancel a non existent stream"
+      );
+    } else {
+      let action = createRenounceAction(
+        event,
+        watcherEntity,
+        event.srcAddress.toString()
+      );
 
-    let action = createRenounceAction(
+      context.Action.set(updateActionStreamInfo(stream.id, action));
+
+      let streamEntity = {
+        ...stream,
+        cancelable: false,
+        renounceAction: action.id,
+        renounceTime: BigInt(event.blockTimestamp),
+      };
+
+      context.Stream.set(streamEntity);
+      context.Watcher.set(updateWatcherActionIndex(watcherEntity));
+    }
+  }
+);
+SablierV2LockupLinearContract_Transfer_loader(({ event, context }) => {
+  let streamTokenId = event.params.tokenId;
+  let streamId = generateStreamId(event.srcAddress, streamTokenId);
+  context.Stream.load(streamId, {});
+  context.Watcher.load(GLOBAL_WATCHER_ID);
+});
+
+SablierV2LockupLinearContract_Transfer_handler(({ event, context }) => {
+  const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
+
+  const watcherEntity: WatcherEntity =
+    watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+
+  let streamTokenId = event.params.tokenId;
+  let streamId = generateStreamId(event.srcAddress, streamTokenId);
+  let stream = context.Stream.get(streamId);
+
+  // it always goes into this if condition here because the Transfer event seems to be emitted before CreateLockupLinearStream event for the same stream
+  // TODO investigate this further
+  if (stream == undefined) {
+    context.log.info(
+      `[SABLIER] Stream hasn't been registered before this transfer event: ${streamId}`
+    );
+    context.log.error(
+      "[SABLIER] - non existent stream, shouldn't be able to transfer a non existent stream"
+    );
+  } else {
+    let newActionEntity = createTransferAction(
       event,
       watcherEntity,
       event.srcAddress.toString()
     );
 
-    context.Action.set(updateActionStreamInfo(stream.id, action));
-
-    let streamEntity = {
-      ...stream,
-      cancelable: false,
-      renounceAction: action.id,
-      renounceTime: BigInt(event.blockTimestamp),
-    };
-
-    context.Stream.set(streamEntity);
-    context.Watcher.set(updateWatcherActionIndex(watcherEntity));
+    context.Action.set(newActionEntity);
+    context.Stream.set(updateStreamTransferInfo(event, stream));
   }
-);
-SablierV2LockupLinearContract_Transfer_loader(({ event, context }) => {});
 
-SablierV2LockupLinearContract_Transfer_handler(({ event, context }) => {});
+  context.Watcher.set(updateWatcherActionIndex(watcherEntity));
+});
 
 SablierV2LockupLinearContract_TransferAdmin_loader(({ event, context }) => {
   context.Contract.load(event.srcAddress.toString());
@@ -319,7 +362,7 @@ SablierV2LockupLinearContract_WithdrawFromLockupStream_handler(
         `[SABLIER] Stream hasn't been registered before this withdraw event: ${streamId}`
       );
       context.log.error(
-        "[SABLIER] - non existent stream, shouldnt be able to withdraw from a non existent stream"
+        "[SABLIER] - non existent stream, shouldn't be able to withdraw from a non existent stream"
       );
     } else {
       context.Stream.set(updateStreamWithdrawalInfo(event, stream));

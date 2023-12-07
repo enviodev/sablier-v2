@@ -6,6 +6,7 @@ import {
   WatcherEntity,
   ActionEntity,
   SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
+  SablierV2LockupLinearContract_TransferEvent_eventArgs,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";
@@ -154,6 +155,27 @@ export function updateStreamRenounceInfo(
   } else {
     return stream;
   }
+}
+
+export function updateStreamTransferInfo(
+  event: eventLog<SablierV2LockupLinearContract_TransferEvent_eventArgs>,
+  stream: StreamEntity
+): StreamEntity {
+  let recipient = event.params.to;
+  let parties = [stream.sender, event.params.to];
+
+  if (stream.proxied) {
+    // Without explicit copies, AssemblyScript will crash (i.e. don't use stream.proxender directly) */
+    let proxender = stream.proxender;
+    if (stream.proxender !== null) {
+      parties.push(stream.proxender);
+    }
+  }
+  return {
+    ...stream,
+    recipient: recipient,
+    parties: parties,
+  };
 }
 
 export function updateStreamWithdrawalInfo(
