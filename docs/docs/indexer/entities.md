@@ -18,13 +18,13 @@ Below is a table of entities and their relationships types defined in the graphq
 | Action   | Emitted events transformed into historical entries (e.g. Create, Withdraw)                 |
 | Stream   | Primary entity tracking the up to date state of a stream                                   |
 | Asset    | The ERC20 asset that is being streamed                                                     |
-| Segment  | The function segment used to build the custom curve in cases of LockupDynamic streams care |
+| Segment  | The function segment used to build the custom curve in cases of LockupDynamic streams |
 
 ### Secondary
 
 | Entity | Description |
 | ------ | ----------- |
-| Watcher | A singleton data store for subgraph-level unique indexes such as the stream or action index
+| Watcher | A per chain data store for unique indexes such as the stream or action index
 
 The following secondary entities were omitted from the Envio Indexer:
 

@@ -20,8 +20,8 @@ const config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'enviodev', // Usually your GitHub org/user name.
+  projectName: 'sablier-v2', // Usually your repo name.
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -82,7 +82,7 @@ const config = {
           },
           // {to: '/blog', label: 'Blog', position: 'left'},
           {
-            href: 'https://github.com/enviodev/sablier_v2/',
+            href: 'https://github.com/enviodev/sablier-v2/',
             label: 'GitHub',
             position: 'right',
           },
@@ -96,11 +96,11 @@ const config = {
             items: [
               {
                 label: 'Overview',
-                to: '/docs/overview',
+                to: '/overview',
               },
               {
                 label: 'Queries',
-                to: '/docs/queries',
+                to: 'indexer/queries',
               },
             ],
           },
@@ -127,7 +127,7 @@ const config = {
               {
 
                 label: 'GitHub',
-                href: 'https://github.com/enviodev/sablier_v2/',
+                href: 'https://github.com/enviodev/sablier-v2/',
               },
             ],
           },

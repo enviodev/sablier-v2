@@ -14,6 +14,6 @@ The Sablier V2 Envio multi-chain Indexer is a modernized version of the current 
 
 - Near real-time notifications of important events from Sablier V2 smart contracts using Envio actions.
 
-<!-- To Do : add hosted service link once deployed-->
-The Sablier V2 Envio multi-chain Indexer is deployed on the Envio Hosted Service and can be accessed [here](www.google.com) to query Sablier data using graphQL. 
+<!-- TO DO : add hosted service link once deployed-->
+The Sablier V2 Envio multi-chain Indexer is deployed on the Envio Hosted Service to query Sablier data using graphQL. 
 
