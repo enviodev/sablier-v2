@@ -30,7 +30,7 @@ amqp.connect(
         queue,
         function (msg) {
           console.log(" [x] Received %s", msg.content.toString());
-          // sendWebhookMessage(msg.content.toString());
+          sendWebhookMessage(msg.content.toString());
         },
         {
           noAck: true,

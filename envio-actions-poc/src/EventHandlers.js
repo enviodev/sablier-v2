@@ -22,9 +22,9 @@ the DB.
 */
 GreeterContract.NewGreeting.handler((event, context) => {
   // proxy for if the indexer is live indexing
-  // if (event.blockTimestamp > indexerStartTimestamp) {
-  sendMessageToQueue(event.params.greeting);
-  // }
+  if (event.blockTimestamp > indexerStartTimestamp) {
+    sendMessageToQueue(event.params.greeting);
+  }
 
   //The id for the "Greeting" entity
   const userId = event.params.user;
