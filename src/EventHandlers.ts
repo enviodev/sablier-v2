@@ -53,7 +53,11 @@ import {
   updateWatcherStreamIndex,
 } from "./helpers/watcher";
 
+import sendMessageToQueue from "./rabbitmq/send";
+
 import { getChainInfoForAddress } from "../src/helpers/index";
+
+const indexerStartTimestamp = Math.floor(new Date().getTime() / 1000);
 
 SablierV2LockupLinearContract_Approval_loader(({ event, context }) => {
   context.Watcher.load(
@@ -87,7 +91,7 @@ SablierV2LockupLinearContract_Approval_handler(({ event, context }) => {
       `[SABLIER] Stream hasn't been registered before this Approval event: ${streamId}`
     );
     context.log.error(
-      "[SABLIER] - non existent stream, shouldn't be able to cancel a non existent stream"
+      "[SABLIER] - non existent stream, shouldn't be able to Approve on a non existent stream"
     );
   } else {
     context.Action.set(updateActionStreamInfo(streamId, actionEntity));
@@ -134,6 +138,20 @@ SablierV2LockupLinearContract_CancelLockupStream_loader(
 
 SablierV2LockupLinearContract_CancelLockupStream_handler(
   ({ event, context }) => {
+    // proxy for if the indexer is live indexing
+    if (event.blockTimestamp > indexerStartTimestamp) {
+      context.log.info("Sending message to queue");
+      sendMessageToQueue(
+        `Stream was cancelled \n tx: ${event.transactionHash} \n sender: ${
+          event.params.sender
+        } \n recipient ${event.params.recipient} \n senderAmount: ${
+          event.params.senderAmount
+        } \n recipientAmount: ${event.params.recipientAmount} \n streamId: ${
+          event.params.streamId
+        } \n chainId: ${getChainInfoForAddress(event.srcAddress).chainId} `
+      );
+    }
+
     const watcher = context.Watcher.get(
       getChainInfoForAddress(event.srcAddress).chainId.toString()
     );
