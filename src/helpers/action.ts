@@ -9,6 +9,8 @@ import {
   SablierV2LockupLinearContract_RenounceLockupStreamEvent_eventArgs,
   SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
   SablierV2LockupLinearContract_TransferEvent_eventArgs,
+  SablierV2LockupLinearContract_ApprovalEvent_eventArgs,
+  SablierV2LockupLinearContract_ApprovalForAllEvent_eventArgs,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";
@@ -144,6 +146,49 @@ export function createWithdrawAction(
     addressA: event.srcAddress.toString(),
     addressB: event.params.to,
     amountB: event.params.amount,
+  };
+
+  return actionEntity;
+}
+
+export function createApprovalAction(
+  event: eventLog<SablierV2LockupLinearContract_ApprovalEvent_eventArgs>,
+  watcher: WatcherEntity,
+  contract_address: string
+): ActionEntity {
+  let partialActionEntity: ActionEntity = createAction(
+    "Approval",
+    event,
+    watcher,
+    contract_address
+  );
+
+  let actionEntity: ActionEntity = {
+    ...partialActionEntity,
+    addressA: event.params.owner,
+    addressB: event.params.approved, // todo: verify this is not a bug
+  };
+
+  return actionEntity;
+}
+
+export function createApprovalForAllAction(
+  event: eventLog<SablierV2LockupLinearContract_ApprovalForAllEvent_eventArgs>,
+  watcher: WatcherEntity,
+  contract_address: string
+): ActionEntity {
+  let partialActionEntity: ActionEntity = createAction(
+    "ApprovalForAll",
+    event,
+    watcher,
+    contract_address
+  );
+
+  let actionEntity: ActionEntity = {
+    ...partialActionEntity,
+    addressA: event.params.owner,
+    addressB: event.params.operator,
+    amountA: event.params.approved? 1n : 0n, 
   };
 
   return actionEntity;
