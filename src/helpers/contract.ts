@@ -1,13 +1,19 @@
-import { ContractEntity } from "../src/Types.gen";
+import {
+  eventLog,
+  ContractEntity,
+  SablierV2LockupLinearContract_TransferAdminEvent_eventArgs,
+} from "../src/Types.gen";
+
+import { getChainInfoForAddress } from "./index";
 
 export function createContract(
   address: string,
-  alias: string,
   category: string
 ): ContractEntity {
   const contractEntity: ContractEntity = {
     id: address,
-    alias: alias,
+    // TODO update the contract alias to the correct one
+    alias: address,
     // TODO update this admin value to the correct one
     admin: "admin",
     address: address,
@@ -15,4 +21,14 @@ export function createContract(
   };
 
   return contractEntity;
+}
+
+export function upgradeContractAdminInfo(
+  event: eventLog<SablierV2LockupLinearContract_TransferAdminEvent_eventArgs>,
+  contractEntity: ContractEntity
+): ContractEntity {
+  return {
+    ...contractEntity,
+    admin: event.params.newAdmin,
+  };
 }

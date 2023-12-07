@@ -1,16 +1,14 @@
 import {
-  StreamEntity,
-  ContractEntity,
   eventLog,
   ActionEntity,
   WatcherEntity,
-  SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
-  SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs,
-  SablierV2LockupLinearContract_RenounceLockupStreamEvent_eventArgs,
-  SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
-  SablierV2LockupLinearContract_TransferEvent_eventArgs,
   SablierV2LockupLinearContract_ApprovalEvent_eventArgs,
   SablierV2LockupLinearContract_ApprovalForAllEvent_eventArgs,
+  SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs,
+  SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
+  SablierV2LockupLinearContract_RenounceLockupStreamEvent_eventArgs,
+  SablierV2LockupLinearContract_TransferEvent_eventArgs,
+  SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";
@@ -48,14 +46,13 @@ function createAction(
 
   return actionEntity;
 }
-
-export function createCreateAction(
-  event: eventLog<SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs>,
+export function createApprovalAction(
+  event: eventLog<SablierV2LockupLinearContract_ApprovalEvent_eventArgs>,
   watcher: WatcherEntity,
   contract_address: string
 ): ActionEntity {
   let partialActionEntity: ActionEntity = createAction(
-    "Create",
+    "Approval",
     event,
     watcher,
     contract_address
@@ -63,9 +60,30 @@ export function createCreateAction(
 
   let actionEntity: ActionEntity = {
     ...partialActionEntity,
-    addressA: event.params.sender,
-    addressB: event.params.recipient,
-    amountA: event.params.amounts[0],
+    addressA: event.params.owner,
+    addressB: event.params.approved, // todo: verify this is not a bug
+  };
+
+  return actionEntity;
+}
+
+export function createApprovalForAllAction(
+  event: eventLog<SablierV2LockupLinearContract_ApprovalForAllEvent_eventArgs>,
+  watcher: WatcherEntity,
+  contract_address: string
+): ActionEntity {
+  let partialActionEntity: ActionEntity = createAction(
+    "ApprovalForAll",
+    event,
+    watcher,
+    contract_address
+  );
+
+  let actionEntity: ActionEntity = {
+    ...partialActionEntity,
+    addressA: event.params.owner,
+    addressB: event.params.operator,
+    amountA: event.params.approved ? 1n : 0n,
   };
 
   return actionEntity;
@@ -89,6 +107,28 @@ export function createCancelAction(
     addressB: event.params.recipient,
     amountA: event.params.senderAmount,
     amountB: event.params.recipientAmount,
+  };
+
+  return actionEntity;
+}
+
+export function createCreateAction(
+  event: eventLog<SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs>,
+  watcher: WatcherEntity,
+  contract_address: string
+): ActionEntity {
+  let partialActionEntity: ActionEntity = createAction(
+    "Create",
+    event,
+    watcher,
+    contract_address
+  );
+
+  let actionEntity: ActionEntity = {
+    ...partialActionEntity,
+    addressA: event.params.sender,
+    addressB: event.params.recipient,
+    amountA: event.params.amounts[0],
   };
 
   return actionEntity;
@@ -146,49 +186,6 @@ export function createWithdrawAction(
     addressA: event.srcAddress.toString(),
     addressB: event.params.to,
     amountB: event.params.amount,
-  };
-
-  return actionEntity;
-}
-
-export function createApprovalAction(
-  event: eventLog<SablierV2LockupLinearContract_ApprovalEvent_eventArgs>,
-  watcher: WatcherEntity,
-  contract_address: string
-): ActionEntity {
-  let partialActionEntity: ActionEntity = createAction(
-    "Approval",
-    event,
-    watcher,
-    contract_address
-  );
-
-  let actionEntity: ActionEntity = {
-    ...partialActionEntity,
-    addressA: event.params.owner,
-    addressB: event.params.approved, // todo: verify this is not a bug
-  };
-
-  return actionEntity;
-}
-
-export function createApprovalForAllAction(
-  event: eventLog<SablierV2LockupLinearContract_ApprovalForAllEvent_eventArgs>,
-  watcher: WatcherEntity,
-  contract_address: string
-): ActionEntity {
-  let partialActionEntity: ActionEntity = createAction(
-    "ApprovalForAll",
-    event,
-    watcher,
-    contract_address
-  );
-
-  let actionEntity: ActionEntity = {
-    ...partialActionEntity,
-    addressA: event.params.owner,
-    addressB: event.params.operator,
-    amountA: event.params.approved? 1n : 0n, 
   };
 
   return actionEntity;

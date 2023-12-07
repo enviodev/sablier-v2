@@ -1,17 +1,17 @@
 import {
-  StreamEntity,
-  ContractEntity,
   eventLog,
-  SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
-  WatcherEntity,
   ActionEntity,
-  SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
+  ContractEntity,
+  StreamEntity,
+  WatcherEntity,
+  SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
   SablierV2LockupLinearContract_TransferEvent_eventArgs,
+  SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";
 
-import { mul, div, add, minus } from "./maths";
+import { add, div, minus, mul } from "./maths";
 
 export function generateStreamId(
   contractAddress: string,
@@ -145,20 +145,31 @@ export function createLinearStream(
   return streamEntity;
 }
 
+export function updateStreamCancelInfo(
+  event: eventLog<any>,
+  stream: StreamEntity,
+  action: ActionEntity
+): StreamEntity {
+  return {
+    ...stream,
+    canceled: true,
+    canceledAction: action.id,
+    canceledTime: BigInt(event.blockTimestamp),
+    intactAmount: event.params.recipientAmount, // The only amount remaining in the stream is the non-withdrawn recipient amount
+  };
+}
+
 export function updateStreamRenounceInfo(
   event: eventLog<any>,
   stream: StreamEntity,
   action: ActionEntity
 ): StreamEntity {
-  if (stream.cancelable == false) {
-    return {
-      ...stream,
-      renounceAction: action.id,
-      renounceTime: BigInt(event.blockTimestamp),
-    };
-  } else {
-    return stream;
-  }
+  return {
+    ...stream,
+    cancelable: false,
+    renounceAction: action.id,
+    renounceTime: BigInt(event.blockTimestamp),
+  };
 }
 
 export function updateStreamTransferInfo(
