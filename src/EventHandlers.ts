@@ -2,22 +2,24 @@
  *Please refer to https://docs.envio.dev for a thorough guide on all Envio indexer features*
  */
 import {
-  SablierV2LockupLinearContract_Approval_loader,
-  SablierV2LockupLinearContract_Approval_handler,
-  SablierV2LockupLinearContract_ApprovalForAll_loader,
-  SablierV2LockupLinearContract_ApprovalForAll_handler,
-  SablierV2LockupLinearContract_CancelLockupStream_loader,
-  SablierV2LockupLinearContract_CancelLockupStream_handler,
-  SablierV2LockupLinearContract_CreateLockupLinearStream_loader,
-  SablierV2LockupLinearContract_CreateLockupLinearStream_handler,
-  SablierV2LockupLinearContract_RenounceLockupStream_loader,
-  SablierV2LockupLinearContract_RenounceLockupStream_handler,
-  SablierV2LockupLinearContract_Transfer_loader,
-  SablierV2LockupLinearContract_Transfer_handler,
-  SablierV2LockupLinearContract_TransferAdmin_loader,
-  SablierV2LockupLinearContract_TransferAdmin_handler,
-  SablierV2LockupLinearContract_WithdrawFromLockupStream_loader,
-  SablierV2LockupLinearContract_WithdrawFromLockupStream_handler,
+  SablierV2LockupContract_Approval_loader,
+  SablierV2LockupContract_Approval_handler,
+  SablierV2LockupContract_ApprovalForAll_loader,
+  SablierV2LockupContract_ApprovalForAll_handler,
+  SablierV2LockupContract_CancelLockupStream_loader,
+  SablierV2LockupContract_CancelLockupStream_handler,
+  SablierV2LockupContract_CreateLockupDynamicStream_handler,
+  SablierV2LockupContract_CreateLockupDynamicStream_loader,
+  SablierV2LockupContract_CreateLockupLinearStream_handler,
+  SablierV2LockupContract_CreateLockupLinearStream_loader,
+  SablierV2LockupContract_RenounceLockupStream_loader,
+  SablierV2LockupContract_RenounceLockupStream_handler,
+  SablierV2LockupContract_Transfer_loader,
+  SablierV2LockupContract_Transfer_handler,
+  SablierV2LockupContract_TransferAdmin_loader,
+  SablierV2LockupContract_TransferAdmin_handler,
+  SablierV2LockupContract_WithdrawFromLockupStream_loader,
+  SablierV2LockupContract_WithdrawFromLockupStream_handler,
 } from "../generated/src/Handlers.gen";
 
 import {
@@ -40,10 +42,12 @@ import {
 import { createAsset } from "./helpers/asset";
 import { createContract, upgradeContractAdminInfo } from "./helpers/contract";
 import {
+  createDynamicStream,
   createLinearStream,
   generateStreamId,
   updateStreamCancelInfo,
   updateStreamRenounceInfo,
+  updateStreamRenounceInfoAtCreation,
   updateStreamTransferInfo,
   updateStreamWithdrawalInfo,
 } from "./helpers/streams";
@@ -59,16 +63,17 @@ import { getChainInfoForAddress } from "../src/helpers/index";
 
 const indexerStartTimestamp = Math.floor(new Date().getTime() / 1000);
 
-SablierV2LockupLinearContract_Approval_loader(({ event, context }) => {
+SablierV2LockupContract_Approval_loader(({ event, context }) => {
   context.Watcher.load(
     getChainInfoForAddress(event.srcAddress).chainId.toString()
   );
+
   let streamTokenId = event.params.tokenId;
   let streamId = generateStreamId(event.srcAddress, streamTokenId);
   context.Stream.load(streamId, {});
 });
 
-SablierV2LockupLinearContract_Approval_handler(({ event, context }) => {
+SablierV2LockupContract_Approval_handler(({ event, context }) => {
   const watcher = context.Watcher.get(
     getChainInfoForAddress(event.srcAddress).chainId.toString()
   );
@@ -100,13 +105,13 @@ SablierV2LockupLinearContract_Approval_handler(({ event, context }) => {
   context.Watcher.set(updateWatcherActionIndex(watcherEntity));
 });
 
-SablierV2LockupLinearContract_ApprovalForAll_loader(({ event, context }) => {
+SablierV2LockupContract_ApprovalForAll_loader(({ event, context }) => {
   context.Watcher.load(
     getChainInfoForAddress(event.srcAddress).chainId.toString()
   );
 });
 
-SablierV2LockupLinearContract_ApprovalForAll_handler(({ event, context }) => {
+SablierV2LockupContract_ApprovalForAll_handler(({ event, context }) => {
   const watcher = context.Watcher.get(
     getChainInfoForAddress(event.srcAddress).chainId.toString()
   );
@@ -125,77 +130,76 @@ SablierV2LockupLinearContract_ApprovalForAll_handler(({ event, context }) => {
   context.Watcher.set(updateWatcherActionIndex(watcherEntity));
 });
 
-SablierV2LockupLinearContract_CancelLockupStream_loader(
-  ({ event, context }) => {
-    context.Watcher.load(
-      getChainInfoForAddress(event.srcAddress).chainId.toString()
+SablierV2LockupContract_CancelLockupStream_loader(({ event, context }) => {
+  context.Watcher.load(
+    getChainInfoForAddress(event.srcAddress).chainId.toString()
+  );
+  let streamTokenId = event.params.streamId;
+  let streamId = generateStreamId(event.srcAddress, streamTokenId);
+  context.Stream.load(streamId, {});
+});
+
+SablierV2LockupContract_CancelLockupStream_handler(({ event, context }) => {
+  const watcher = context.Watcher.get(
+    getChainInfoForAddress(event.srcAddress).chainId.toString()
+  );
+
+  // proxy for if the indexer is live indexing
+  if (event.blockTimestamp > indexerStartTimestamp) {
+    context.log.info("Sending message to queue");
+    sendMessageToQueue(
+      `Stream was cancelled \n tx: ${event.transactionHash} \n sender: ${
+        event.params.sender
+      } \n recipient ${event.params.recipient} \n senderAmount: ${
+        event.params.senderAmount
+      } \n recipientAmount: ${event.params.recipientAmount} \n streamId: ${
+        event.params.streamId
+      } \n chainId: ${getChainInfoForAddress(event.srcAddress).chainId} `
     );
-    let streamTokenId = event.params.streamId;
-    let streamId = generateStreamId(event.srcAddress, streamTokenId);
-    context.Stream.load(streamId, {});
   }
-);
 
-SablierV2LockupLinearContract_CancelLockupStream_handler(
-  ({ event, context }) => {
-    // proxy for if the indexer is live indexing
-    if (event.blockTimestamp > indexerStartTimestamp) {
-      context.log.info("Sending message to queue");
-      sendMessageToQueue(
-        `Stream was cancelled \n tx: ${event.transactionHash} \n sender: ${
-          event.params.sender
-        } \n recipient ${event.params.recipient} \n senderAmount: ${
-          event.params.senderAmount
-        } \n recipientAmount: ${event.params.recipientAmount} \n streamId: ${
-          event.params.streamId
-        } \n chainId: ${getChainInfoForAddress(event.srcAddress).chainId} `
-      );
-    }
+  const watcherEntity: WatcherEntity =
+    watcher ??
+    createWatcher(getChainInfoForAddress(event.srcAddress).chainId.toString());
 
-    const watcher = context.Watcher.get(
-      getChainInfoForAddress(event.srcAddress).chainId.toString()
+  let actionEntity = createCancelAction(
+    event,
+    watcherEntity,
+    event.srcAddress.toString()
+  );
+
+  let streamTokenId = event.params.streamId;
+  let streamId = generateStreamId(event.srcAddress, streamTokenId);
+  let stream = context.Stream.get(streamId);
+
+  if (stream == undefined) {
+    context.log.info(
+      `[SABLIER] Stream hasn't been registered before this Cancel event: ${streamId}`
     );
-
-    const watcherEntity: WatcherEntity =
-      watcher ?? createWatcher(event.srcAddress.toString());
-
-    let actionEntity = createCancelAction(
-      event,
-      watcherEntity,
-      event.srcAddress.toString()
+    context.log.error(
+      "[SABLIER] - non existent stream, shouldn't be able to cancel a non existent stream"
     );
-
-    let streamTokenId = event.params.streamId;
-    let streamId = generateStreamId(event.srcAddress, streamTokenId);
-    let stream = context.Stream.get(streamId);
-
-    if (stream == undefined) {
-      context.log.info(
-        `[SABLIER] Stream hasn't been registered before this Cancel event: ${streamId}`
-      );
-      context.log.error(
-        "[SABLIER] - non existent stream, shouldn't be able to cancel a non existent stream"
-      );
-    } else {
-      context.Action.set(updateActionStreamInfo(streamId, actionEntity));
-      context.Stream.set(updateStreamCancelInfo(event, stream, actionEntity));
-    }
-
-    context.Watcher.set(updateWatcherActionIndex(watcherEntity));
+  } else {
+    context.Action.set(updateActionStreamInfo(streamId, actionEntity));
+    context.Stream.set(updateStreamCancelInfo(event, stream, actionEntity));
   }
-);
 
-SablierV2LockupLinearContract_CreateLockupLinearStream_loader(
+  context.Watcher.set(updateWatcherActionIndex(watcherEntity));
+});
+
+SablierV2LockupContract_CreateLockupDynamicStream_loader(
   ({ event, context }) => {
     context.Asset.load(event.params.asset.toString());
     context.Contract.load(event.srcAddress.toString());
     context.Watcher.load(
       getChainInfoForAddress(event.srcAddress).chainId.toString()
     );
+    let streamTokenId = event.params.streamId;
+    let streamId = generateStreamId(event.srcAddress, streamTokenId);
   }
 );
 
-SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
+SablierV2LockupContract_CreateLockupDynamicStream_handler(
   ({ event, context }) => {
     const asset = context.Asset.get(event.params.asset.toString());
     const contract = context.Contract.get(event.srcAddress.toString());
@@ -211,7 +215,68 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
       createAsset(event.params.asset.toString(), watcherEntity.chainId);
 
     const contractEntity: ContractEntity =
-      contract ?? createContract(event.srcAddress.toString(), "LockupLinear");
+      contract ?? createContract(event.srcAddress.toString());
+
+    // Create the stream entity
+    let newStreamEntity: StreamEntity = createDynamicStream(
+      event,
+      watcherEntity,
+      contractEntity,
+      assetEntity
+    );
+
+    // Create the action entity
+    let newActionEntity = createCreateAction(
+      event,
+      watcherEntity,
+      event.srcAddress.toString()
+    );
+
+    // Updating entity values
+    context.Action.set(
+      updateActionStreamInfo(newStreamEntity.id, newActionEntity)
+    );
+    context.Asset.set(assetEntity);
+    context.Stream.set(
+      updateStreamRenounceInfoAtCreation(
+        event,
+        newStreamEntity,
+        newActionEntity
+      )
+    );
+    context.Contract.set(contractEntity);
+    context.Watcher.set(
+      updateWatcherActionIndex(updateWatcherStreamIndex(watcherEntity))
+    );
+  }
+);
+SablierV2LockupContract_CreateLockupLinearStream_loader(
+  ({ event, context }) => {
+    context.Asset.load(event.params.asset.toString());
+    context.Contract.load(event.srcAddress.toString());
+    context.Watcher.load(
+      getChainInfoForAddress(event.srcAddress).chainId.toString()
+    );
+  }
+);
+
+SablierV2LockupContract_CreateLockupLinearStream_handler(
+  ({ event, context }) => {
+    const asset = context.Asset.get(event.params.asset.toString());
+    const contract = context.Contract.get(event.srcAddress.toString());
+    const watcher = context.Watcher.get(
+      getChainInfoForAddress(event.srcAddress).chainId.toString()
+    );
+
+    const watcherEntity: WatcherEntity =
+      watcher ?? createWatcher(event.srcAddress.toString());
+
+    const assetEntity: AssetEntity =
+      asset ??
+      createAsset(event.params.asset.toString(), watcherEntity.chainId);
+
+    const contractEntity: ContractEntity =
+      contract ?? createContract(event.srcAddress.toString());
 
     // Create the stream entity
     let newStreamEntity: StreamEntity = createLinearStream(
@@ -234,7 +299,11 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
     );
     context.Asset.set(assetEntity);
     context.Stream.set(
-      updateStreamRenounceInfo(event, newStreamEntity, newActionEntity)
+      updateStreamRenounceInfoAtCreation(
+        event,
+        newStreamEntity,
+        newActionEntity
+      )
     );
     context.Contract.set(contractEntity);
     context.Watcher.set(
@@ -243,51 +312,47 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
   }
 );
 
-SablierV2LockupLinearContract_RenounceLockupStream_loader(
-  ({ event, context }) => {
-    let streamTokenId = event.params.streamId;
-    let streamId = generateStreamId(event.srcAddress, streamTokenId);
-    context.Stream.load(streamId, {});
-    context.Watcher.load(
-      getChainInfoForAddress(event.srcAddress).chainId.toString()
+SablierV2LockupContract_RenounceLockupStream_loader(({ event, context }) => {
+  let streamTokenId = event.params.streamId;
+  let streamId = generateStreamId(event.srcAddress, streamTokenId);
+  context.Stream.load(streamId, {});
+  context.Watcher.load(
+    getChainInfoForAddress(event.srcAddress).chainId.toString()
+  );
+});
+
+SablierV2LockupContract_RenounceLockupStream_handler(({ event, context }) => {
+  const watcher = context.Watcher.get(
+    getChainInfoForAddress(event.srcAddress).chainId.toString()
+  );
+
+  const watcherEntity: WatcherEntity =
+    watcher ?? createWatcher(event.srcAddress.toString());
+
+  let streamTokenId = event.params.streamId;
+  let streamId = generateStreamId(event.srcAddress, streamTokenId);
+  let stream = context.Stream.get(streamId);
+
+  if (stream == undefined) {
+    context.log.info(
+      `[SABLIER] Stream hasn't been registered before this Renounce event: ${streamId}`
     );
-  }
-);
-
-SablierV2LockupLinearContract_RenounceLockupStream_handler(
-  ({ event, context }) => {
-    const watcher = context.Watcher.get(
-      getChainInfoForAddress(event.srcAddress).chainId.toString()
+    context.log.error(
+      "[SABLIER] - non existent stream, shouldn't be able to renounce a non existent stream"
+    );
+  } else {
+    let actionEntity = createRenounceAction(
+      event,
+      watcherEntity,
+      event.srcAddress.toString()
     );
 
-    const watcherEntity: WatcherEntity =
-      watcher ?? createWatcher(event.srcAddress.toString());
-
-    let streamTokenId = event.params.streamId;
-    let streamId = generateStreamId(event.srcAddress, streamTokenId);
-    let stream = context.Stream.get(streamId);
-
-    if (stream == undefined) {
-      context.log.info(
-        `[SABLIER] Stream hasn't been registered before this Renounce event: ${streamId}`
-      );
-      context.log.error(
-        "[SABLIER] - non existent stream, shouldn't be able to renounce a non existent stream"
-      );
-    } else {
-      let actionEntity = createRenounceAction(
-        event,
-        watcherEntity,
-        event.srcAddress.toString()
-      );
-
-      context.Action.set(updateActionStreamInfo(streamId, actionEntity));
-      context.Stream.set(updateStreamRenounceInfo(event, stream, actionEntity));
-    }
-    context.Watcher.set(updateWatcherActionIndex(watcherEntity));
+    context.Action.set(updateActionStreamInfo(streamId, actionEntity));
+    context.Stream.set(updateStreamRenounceInfo(event, stream, actionEntity));
   }
-);
-SablierV2LockupLinearContract_Transfer_loader(({ event, context }) => {
+  context.Watcher.set(updateWatcherActionIndex(watcherEntity));
+});
+SablierV2LockupContract_Transfer_loader(({ event, context }) => {
   let streamTokenId = event.params.tokenId;
   let streamId = generateStreamId(event.srcAddress, streamTokenId);
   context.Stream.load(streamId, {});
@@ -296,7 +361,7 @@ SablierV2LockupLinearContract_Transfer_loader(({ event, context }) => {
   );
 });
 
-SablierV2LockupLinearContract_Transfer_handler(({ event, context }) => {
+SablierV2LockupContract_Transfer_handler(({ event, context }) => {
   const watcher = context.Watcher.get(
     getChainInfoForAddress(event.srcAddress).chainId.toString()
   );
@@ -334,20 +399,20 @@ SablierV2LockupLinearContract_Transfer_handler(({ event, context }) => {
   context.Watcher.set(updateWatcherActionIndex(watcherEntity));
 });
 
-SablierV2LockupLinearContract_TransferAdmin_loader(({ event, context }) => {
+SablierV2LockupContract_TransferAdmin_loader(({ event, context }) => {
   context.Contract.load(event.srcAddress.toString());
 });
 
-SablierV2LockupLinearContract_TransferAdmin_handler(({ event, context }) => {
+SablierV2LockupContract_TransferAdmin_handler(({ event, context }) => {
   let contract = context.Contract.get(event.srcAddress.toString());
 
   const contractEntity: ContractEntity =
-    contract ?? createContract(event.srcAddress.toString(), "LockupLinear");
+    contract ?? createContract(event.srcAddress.toString());
 
   context.Contract.set(upgradeContractAdminInfo(event, contractEntity));
 });
 
-SablierV2LockupLinearContract_WithdrawFromLockupStream_loader(
+SablierV2LockupContract_WithdrawFromLockupStream_loader(
   ({ event, context }) => {
     context.Watcher.load(
       getChainInfoForAddress(event.srcAddress).chainId.toString()
@@ -358,7 +423,7 @@ SablierV2LockupLinearContract_WithdrawFromLockupStream_loader(
   }
 );
 
-SablierV2LockupLinearContract_WithdrawFromLockupStream_handler(
+SablierV2LockupContract_WithdrawFromLockupStream_handler(
   ({ event, context }) => {
     const watcher = context.Watcher.get(
       getChainInfoForAddress(event.srcAddress).chainId.toString()

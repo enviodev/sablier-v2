@@ -1,15 +1,15 @@
 import { expect } from "chai";
 import {
   MockDb,
-  createMockSablierV2LockupLinearApprovalEvent,
-  createMockSablierV2LockupLinearCreateLockupLinearStreamEvent,
+  createMockSablierV2LockupApprovalEvent,
+  createMockSablierV2LockupCreateLockupLinearStreamEvent,
   eventProcessors,
 } from "../generated/src/TestHelpers.gen";
 import {
   ActionEntity,
   AssetEntity,
-  SablierV2LockupLinearContract_ApprovalEvent_log,
-  SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_log,
+  SablierV2LockupContract_ApprovalEvent_log,
+  SablierV2LockupContract_CreateLockupLinearStreamEvent_log,
   StreamEntity,
   watcherEntity,
 } from "../generated/src/Types.gen";
@@ -77,8 +77,8 @@ describe("Sablier V2 Linear Lockup Stream Tests", () => {
     mockDbInitial.entities.Watcher.set(defaultWatcherEntity);
 
     // Creating a mock event
-    let mockCreateLockupLinearApprovalEvent: SablierV2LockupLinearContract_ApprovalEvent_log =
-      createMockSablierV2LockupLinearApprovalEvent({
+    let mockCreateLockupLinearApprovalEvent: SablierV2LockupContract_ApprovalEvent_log =
+      createMockSablierV2LockupApprovalEvent({
         args: {
           // (address indexed owner, address indexed approved, uint256 indexed tokenId)
           owner: Addresses.defaultAddress,
@@ -94,11 +94,10 @@ describe("Sablier V2 Linear Lockup Stream Tests", () => {
     );
 
     // Processing the mock event on the mock database
-    let updatedMockDb =
-      eventProcessors.SablierV2LockupLinear.Approval.processEvent({
-        event: mockCreateLockupLinearApprovalEvent,
-        mockDb: mockDbInitial,
-      });
+    let updatedMockDb = eventProcessors.SablierV2Lockup.Approval.processEvent({
+      event: mockCreateLockupLinearApprovalEvent,
+      mockDb: mockDbInitial,
+    });
 
     // Expected entity that should be created
     let expectedActionEntity: ActionEntity = {
@@ -139,8 +138,8 @@ describe("Sablier V2 Linear Lockup Stream Tests", () => {
     let assetId = Addresses_defaultAddress;
 
     // Creating a mock event
-    let mockCreateLockupLinearCreateLockupLinearStreamEvent: SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_log =
-      createMockSablierV2LockupLinearCreateLockupLinearStreamEvent({
+    let mockCreateLockupLinearCreateLockupLinearStreamEvent: SablierV2LockupContract_CreateLockupLinearStreamEvent_log =
+      createMockSablierV2LockupCreateLockupLinearStreamEvent({
         args: {
           asset: assetId,
         },
@@ -148,12 +147,10 @@ describe("Sablier V2 Linear Lockup Stream Tests", () => {
 
     // Processing the mock event on the mock database
     let updatedMockDb =
-      eventProcessors.SablierV2LockupLinear.CreateLockupLinearStream.processEvent(
-        {
-          event: mockCreateLockupLinearCreateLockupLinearStreamEvent,
-          mockDb: mockDbInitial,
-        }
-      );
+      eventProcessors.SablierV2Lockup.CreateLockupLinearStream.processEvent({
+        event: mockCreateLockupLinearCreateLockupLinearStreamEvent,
+        mockDb: mockDbInitial,
+      });
 
     // Expected entity that should be created
     let expectedAssetEntity: AssetEntity = {

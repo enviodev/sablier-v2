@@ -70,7 +70,7 @@ const addressToChainMapping: AddressToChainMapping = {
     aliasKey: "ll",
   },
   // Mainnet (SablierV2LockupDynamic)
-  "0x39efdc3dbb57b2388cc4bb40ac4cb1226bc9e44": {
+  "0x39efdc3dbb57b2388ccc4bb40ac4cb1226bc9e44": {
     chainId: 1,
     chainName: "mainnet",
     aliasKey: "ld",
@@ -149,7 +149,7 @@ export function getChainInfoForAddress(address: string): ChainInfo {
 }
 
 // Testing function
-// const exampleAddress: string = '0x197d655f3be03903fd25e7828c3534504bfe525e';
+// const exampleAddress: string = "0x39EFdC3dbB57B2388CcC4bb40aC4CB1226Bc9E44";
 // const chainInfo = getChainInfoForAddress(exampleAddress);
 
 // if (chainInfo !== null) {
