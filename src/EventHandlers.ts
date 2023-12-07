@@ -288,7 +288,7 @@ SablierV2LockupLinearContract_Transfer_handler(({ event, context }) => {
   // TODO investigate this further
   if (stream == undefined) {
     context.log.info(
-      `[SABLIER] Stream hasn't been registered before this transfer event: ${streamId}`
+      `[SABLIER] Stream hasn't been registered before this transfer event: ${streamId}, ${event.transactionHash}`
     );
     context.log.error(
       "[SABLIER] - non existent stream, shouldn't be able to transfer a non existent stream"
