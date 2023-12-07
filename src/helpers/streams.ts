@@ -4,9 +4,10 @@ import {
   ContractEntity,
   StreamEntity,
   WatcherEntity,
+  SablierV2LockupContract_CreateLockupDynamicStreamEvent_eventArgs,
+  SablierV2LockupContract_CreateLockupLinearStreamEvent_eventArgs,
   SablierV2LockupContract_TransferEvent_eventArgs,
   SablierV2LockupContract_WithdrawFromLockupStreamEvent_eventArgs,
-  SablierV2LockupContract_CreateLockupLinearStreamEvent_eventArgs,
   AssetEntity,
 } from "../src/Types.gen";
 
@@ -47,7 +48,10 @@ export function generateStreamAlias(
 
 function createStream(
   tokenId: bigint,
-  event: eventLog<SablierV2LockupContract_CreateLockupLinearStreamEvent_eventArgs>,
+  event: eventLog<
+    | SablierV2LockupContract_CreateLockupLinearStreamEvent_eventArgs
+    | SablierV2LockupContract_CreateLockupDynamicStreamEvent_eventArgs
+  >,
   watcher: WatcherEntity,
   contract: ContractEntity
 ): StreamEntity {
@@ -65,16 +69,16 @@ function createStream(
     hash: event.transactionHash,
     timestamp: BigInt(event.blockTimestamp),
     category: "",
-    recipient: event.params.recipient,
-    parties: [event.params.sender, event.params.recipient],
     funder: event.params.funder,
     sender: event.params.sender,
+    recipient: event.params.recipient,
+    parties: [event.params.sender, event.params.recipient],
+    cancelable: event.params.cancelable,
     proxender: "",
     chainId: BigInt(chainInfo.chainId),
     proxied: false,
     cliff: false,
     asset: event.params.asset,
-    cancelable: event.params.cancelable,
     renounceAction: null,
     renounceTime: 0n,
     canceled: false,
@@ -82,19 +86,52 @@ function createStream(
     canceledTime: 0n,
     cliffTime: 0n,
     cliffAmount: 0n,
-    endTime: event.params.range[2],
+    endTime: 0n,
     startTime: event.params.range[0],
-    duration: event.params.range[2] - event.params.range[0],
+    duration: 0n,
     depositAmount: event.params.amounts[0],
     intactAmount: event.params.amounts[0],
     withdrawnAmount: 0n,
-    brokerFeeAmount: event.params.amounts[1],
-    protocolFeeAmount: event.params.amounts[2],
+    brokerFeeAmount: event.params.amounts[2],
+    protocolFeeAmount: event.params.amounts[1],
   };
 
   return partialStreamEntity;
 }
 
+export function createDynamicStream(
+  event: eventLog<SablierV2LockupContract_CreateLockupDynamicStreamEvent_eventArgs>,
+  watcher: WatcherEntity,
+  contract: ContractEntity,
+  asset: AssetEntity
+): StreamEntity {
+  let tokenId = event.params.streamId;
+  let partialStreamEntity: StreamEntity = createStream(
+    tokenId,
+    event,
+    watcher,
+    contract
+  );
+
+  // /** --------------- */
+  // entity = createSegments(entity, event);
+
+  let duration = minus(event.params.range[1], event.params.range[0]);
+
+  const streamEntity: StreamEntity = {
+    ...partialStreamEntity,
+    category: "LockupDynamic",
+    endTime: event.params.range[1],
+    duration: duration,
+    asset: asset.id,
+    cliff: false,
+  };
+
+  // TODO: leaving this out for now for the complexity it will add
+  //   let resolved = bindProxyOwner(entity);
+
+  return streamEntity;
+}
 export function createLinearStream(
   event: eventLog<SablierV2LockupContract_CreateLockupLinearStreamEvent_eventArgs>,
   watcher: WatcherEntity,
@@ -129,11 +166,7 @@ export function createLinearStream(
   const streamEntity: StreamEntity = {
     ...partialStreamEntity,
     category: "LockupLinear",
-    funder: event.params.funder,
-    sender: event.params.sender,
-    recipient: event.params.recipient,
-    parties: [event.params.sender, event.params.recipient],
-    cancelable: event.params.cancelable,
+    endTime: event.params.range[2],
     duration: duration,
     asset: asset.id,
     cliff: cliff,
@@ -172,6 +205,22 @@ export function updateStreamRenounceInfo(
     renounceAction: action.id,
     renounceTime: BigInt(event.blockTimestamp),
   };
+}
+
+export function updateStreamRenounceInfoAtCreation(
+  event: eventLog<any>,
+  stream: StreamEntity,
+  action: ActionEntity
+): StreamEntity {
+  if (stream.cancelable == false) {
+    return {
+      ...stream,
+      renounceAction: action.id,
+      renounceTime: BigInt(event.blockTimestamp),
+    };
+  } else {
+    return stream;
+  }
 }
 
 export function updateStreamTransferInfo(
