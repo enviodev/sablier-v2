@@ -16,8 +16,8 @@ import {
   SablierV2LockupContract_TransferAdmin_handler,
   SablierV2LockupContract_WithdrawFromLockupStream_loader,
   SablierV2LockupContract_WithdrawFromLockupStream_handler,
-  SablierV2LockupLinearContract_CreateLockupLinearStream_handler,
-  SablierV2LockupLinearContract_CreateLockupLinearStream_loader,
+  SablierV2LockupContract_CreateLockupLinearStream_handler,
+  SablierV2LockupContract_CreateLockupLinearStream_loader,
   // SablierV2LockupDynamicContract_CreateLockupDynamicStream_handler,
   // SablierV2LockupDynamicContract_CreateLockupDynamicStream_loader,
 } from "../generated/src/Handlers.gen";
@@ -154,7 +154,7 @@ SablierV2LockupContract_CancelLockupStream_handler(({ event, context }) => {
   context.Watcher.set(updateWatcherActionIndex(watcherEntity));
 });
 
-SablierV2LockupLinearContract_CreateLockupLinearStream_loader(
+SablierV2LockupContract_CreateLockupLinearStream_loader(
   ({ event, context }) => {
     context.Asset.load(event.params.asset.toString());
     context.Contract.load(event.srcAddress.toString());
@@ -162,7 +162,7 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_loader(
   }
 );
 
-SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
+SablierV2LockupContract_CreateLockupLinearStream_handler(
   ({ event, context }) => {
     const asset = context.Asset.get(event.params.asset.toString());
     const contract = context.Contract.get(event.srcAddress.toString());

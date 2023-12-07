@@ -14,6 +14,16 @@ contracts:
         requiredEntities:
           - name: Stream
           - name: Watcher
+      - event: CreateLockupLinearStream(uint256 streamId, address funder, address indexed sender, address indexed recipient, (uint128,uint128,uint128) amounts, address indexed asset, bool cancelable, (uint40,uint40,uint40) range, address broker)
+        requiredEntities:
+          - name: Asset
+          - name: Contract
+          - name: Watcher
+      - event: CreateLockupDynamicStream(uint256 streamId, address funder, address indexed sender, address indexed recipient, (uint128,uint128,uint128) amounts, address indexed asset, bool cancelable, (uint128,uint64,uint40)[] segments, (uint40,uint40) range, address broker)
+        requiredEntities:
+          - name: Asset
+          - name: Contract
+          - name: Watcher
       - event: RenounceLockupStream(uint256 indexed streamId)
         requiredEntities:
           - name: Stream
@@ -29,22 +39,6 @@ contracts:
         requiredEntities:
           - name: Stream
           - name: Watcher
-  - name: SablierV2LockupLinear
-    handler: src/EventHandlers.ts
-    events:
-      - event: CreateLockupLinearStream(uint256 streamId, address funder, address indexed sender, address indexed recipient, (uint128,uint128,uint128) amounts, address indexed asset, bool cancelable, (uint40,uint40,uint40) range, address broker)
-        requiredEntities:
-          - name: Asset
-          - name: Contract
-          - name: Watcher
-  # - name: SablierV2LockupDynamic
-  #   handler: src/EventHandlers.ts
-  #   events:
-  #     - event: CreateLockupDynamicStream(uint256 streamId, address funder, address indexed sender, address indexed recipient, (uint128,uint128,uint128) amounts, address indexed asset, bool cancelable, (uint128,uint64,uint40)[] segments, (uint40,uint40) range, address broker)
-  #       requiredEntities:
-  #         - name: Asset
-  #         - name: Contract
-  #         - name: Watcher
 networks:
   - id: 1 # Ethereum
     start_block: 0
@@ -52,13 +46,7 @@ networks:
       - name: SablierV2Lockup
         address:
           - 0xB10daee1FCF62243aE27776D7a92D39dC8740f95
-          # - 0x39EFdC3dbB57B2388CcC4bb40aC4CB1226Bc9E44
-      # - name: SablierV2LockupLinear
-      #   address:
-      #     - 0xB10daee1FCF62243aE27776D7a92D39dC8740f95
-      # - name: SablierV2LockupDynamic
-      #   address:
-      #     - 0x39EFdC3dbB57B2388CcC4bb40aC4CB1226Bc9E44
+          - 0x39EFdC3dbB57B2388CcC4bb40aC4CB1226Bc9E44
   # - id: 42161 # Arbitrum
   #   start_block: 0
   #   contracts:

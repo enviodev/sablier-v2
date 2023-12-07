@@ -8,7 +8,7 @@ import {
   SablierV2LockupContract_RenounceLockupStreamEvent_eventArgs,
   SablierV2LockupContract_TransferEvent_eventArgs,
   SablierV2LockupContract_WithdrawFromLockupStreamEvent_eventArgs,
-  SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
+  SablierV2LockupContract_CreateLockupLinearStreamEvent_eventArgs,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";
@@ -113,7 +113,7 @@ export function createCancelAction(
 }
 
 export function createCreateAction(
-  event: eventLog<SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs>,
+  event: eventLog<SablierV2LockupContract_CreateLockupLinearStreamEvent_eventArgs>,
   watcher: WatcherEntity,
   contract_address: string
 ): ActionEntity {

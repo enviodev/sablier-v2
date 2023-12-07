@@ -6,7 +6,7 @@ import {
   WatcherEntity,
   SablierV2LockupContract_TransferEvent_eventArgs,
   SablierV2LockupContract_WithdrawFromLockupStreamEvent_eventArgs,
-  SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
+  SablierV2LockupContract_CreateLockupLinearStreamEvent_eventArgs,
   AssetEntity,
 } from "../src/Types.gen";
 
@@ -47,7 +47,7 @@ export function generateStreamAlias(
 
 function createStream(
   tokenId: bigint,
-  event: eventLog<SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs>,
+  event: eventLog<SablierV2LockupContract_CreateLockupLinearStreamEvent_eventArgs>,
   watcher: WatcherEntity,
   contract: ContractEntity
 ): StreamEntity {
@@ -96,7 +96,7 @@ function createStream(
 }
 
 export function createLinearStream(
-  event: eventLog<SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs>,
+  event: eventLog<SablierV2LockupContract_CreateLockupLinearStreamEvent_eventArgs>,
   watcher: WatcherEntity,
   contract: ContractEntity,
   asset: AssetEntity
