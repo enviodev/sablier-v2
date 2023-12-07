@@ -2,15 +2,21 @@ import { expect } from "chai";
 import {
   MockDb,
   createMockSablierV2LockupLinearApprovalEvent,
+  createMockSablierV2LockupLinearCreateLockupLinearStreamEvent,
   eventProcessors,
 } from "../generated/src/TestHelpers.gen";
 import {
   ActionEntity,
+  AssetEntity,
   SablierV2LockupLinearContract_ApprovalEvent_log,
+  SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_log,
   StreamEntity,
   watcherEntity,
 } from "../generated/src/Types.gen";
-import { Addresses } from "../generated/src/bindings/Ethers.gen";
+import {
+  Addresses,
+  Addresses_defaultAddress,
+} from "../generated/src/bindings/Ethers.gen";
 
 import { generateActionId } from "../src/helpers/action";
 import { generateStreamId } from "../src/helpers/streams";
@@ -121,5 +127,46 @@ describe("Sablier V2 Linear Lockup Stream Tests", () => {
 
     // Asserting that the entity in the mock database is the same as the expected entity
     expect(expectedActionEntity).to.deep.equal(actualActionEntity);
+  });
+
+  it("Asset entity is created correctly", () => {
+    // Initializing the mock database
+    let mockDbInitial = MockDb.createMockDb();
+
+    // Initialize the entities in the mock database required for event processing
+    mockDbInitial.entities.Stream.set(defaultStreamEntity);
+    mockDbInitial.entities.Watcher.set(defaultWatcherEntity);
+
+    let assetId = Addresses_defaultAddress;
+
+    // Creating a mock event
+    let mockCreateLockupLinearCreateLockupLinearStreamEvent: SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_log =
+      createMockSablierV2LockupLinearCreateLockupLinearStreamEvent({
+        args: {
+          asset: assetId,
+        },
+      });
+
+    // Processing the mock event on the mock database
+    let updatedMockDb =
+      eventProcessors.SablierV2LockupLinear.CreateLockupLinearStream.processEvent(
+        {
+          event: mockCreateLockupLinearCreateLockupLinearStreamEvent,
+          mockDb: mockDbInitial,
+        }
+      );
+
+    // Expected entity that should be created
+    let expectedAssetEntity: AssetEntity = {
+      id: assetId,
+      address: assetId,
+      chainId: 1n,
+    };
+
+    // Getting the entity from the mock database
+    let actualAssetEntity = updatedMockDb.entities.Asset.get(assetId);
+
+    // Asserting that the entity in the mock database is the same as the expected entity
+    expect(expectedAssetEntity).to.deep.equal(actualAssetEntity);
   });
 });
