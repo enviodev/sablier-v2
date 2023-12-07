@@ -1,0 +1,18 @@
+{
+  "name": "receiver-service",
+  "version": "1.0.0",
+  "description": "A receiver service to receive messages from rabbitMQ and perform certain actions such as messaging a discord webhook",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "test"
+  },
+  "author": "envio",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.10.3",
+    "axios": "^1.6.2",
+    "nodemon": "^3.0.2"
+  }
+}
