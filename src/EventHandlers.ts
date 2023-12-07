@@ -18,8 +18,8 @@ import {
   SablierV2LockupContract_WithdrawFromLockupStream_handler,
   SablierV2LockupLinearContract_CreateLockupLinearStream_handler,
   SablierV2LockupLinearContract_CreateLockupLinearStream_loader,
-  SablierV2LockupDynamicContract_CreateLockupDynamicStream_handler,
-  SablierV2LockupDynamicContract_CreateLockupDynamicStream_loader,
+  // SablierV2LockupDynamicContract_CreateLockupDynamicStream_handler,
+  // SablierV2LockupDynamicContract_CreateLockupDynamicStream_loader,
 } from "../generated/src/Handlers.gen";
 
 import {
