@@ -5,12 +5,6 @@ type Asset {
   address: Bytes!
   "hardcoded chain id"
   chainId: BigInt!
-  "decimals of the ERC20 asset/token"
-  decimals: BigInt!
-  "name of the ERC20 asset/token"
-  name: String!
-  "symbol of the ERC20 asset/token"
-  symbol: String!
   "streams that rely on this asset/token"
   streams: [Stream!]! @derivedFrom(field: "asset")
 }

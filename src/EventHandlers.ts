@@ -20,7 +20,12 @@ import {
   SablierV2LockupLinearContract_WithdrawFromLockupStream_handler,
 } from "../generated/src/Handlers.gen";
 
-import { ContractEntity, StreamEntity, WatcherEntity } from "./src/Types.gen";
+import {
+  AssetEntity,
+  ContractEntity,
+  StreamEntity,
+  WatcherEntity,
+} from "./src/Types.gen";
 
 import {
   createApprovalAction,
@@ -32,6 +37,7 @@ import {
   createWithdrawAction,
   updateActionStreamInfo,
 } from "./helpers/action";
+import { createAsset } from "./helpers/asset";
 import { createContract, upgradeContractAdminInfo } from "./helpers/contract";
 import {
   createLinearStream,
@@ -61,7 +67,7 @@ SablierV2LockupLinearContract_Approval_handler(({ event, context }) => {
   const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
 
   const watcherEntity: WatcherEntity =
-    watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+    watcher ?? createWatcher(GLOBAL_WATCHER_ID, event.srcAddress.toString());
 
   let actionEntity = createApprovalAction(
     event,
@@ -95,7 +101,7 @@ SablierV2LockupLinearContract_ApprovalForAll_handler(({ event, context }) => {
   const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
 
   const watcherEntity: WatcherEntity =
-    watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+    watcher ?? createWatcher(GLOBAL_WATCHER_ID, event.srcAddress.toString());
 
   let actionEntity = createApprovalForAllAction(
     event,
@@ -122,7 +128,7 @@ SablierV2LockupLinearContract_CancelLockupStream_handler(
     const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
 
     const watcherEntity: WatcherEntity =
-      watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+      watcher ?? createWatcher(GLOBAL_WATCHER_ID, event.srcAddress.toString());
 
     let actionEntity = createCancelAction(
       event,
@@ -152,6 +158,7 @@ SablierV2LockupLinearContract_CancelLockupStream_handler(
 
 SablierV2LockupLinearContract_CreateLockupLinearStream_loader(
   ({ event, context }) => {
+    context.Asset.load(event.params.asset.toString());
     context.Contract.load(event.srcAddress.toString());
     context.Watcher.load(GLOBAL_WATCHER_ID);
   }
@@ -159,11 +166,16 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_loader(
 
 SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
   ({ event, context }) => {
+    const asset = context.Asset.get(event.params.asset.toString());
     const contract = context.Contract.get(event.srcAddress.toString());
     const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
 
     const watcherEntity: WatcherEntity =
-      watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+      watcher ?? createWatcher(GLOBAL_WATCHER_ID, event.srcAddress.toString());
+
+    const assetEntity: AssetEntity =
+      asset ??
+      createAsset(event.params.asset.toString(), watcherEntity.chainId);
 
     const contractEntity: ContractEntity =
       contract ?? createContract(event.srcAddress.toString(), "LockupLinear");
@@ -172,7 +184,8 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
     let newStreamEntity: StreamEntity = createLinearStream(
       event,
       watcherEntity,
-      contractEntity
+      contractEntity,
+      assetEntity
     );
 
     // Create the action entity
@@ -186,6 +199,7 @@ SablierV2LockupLinearContract_CreateLockupLinearStream_handler(
     context.Action.set(
       updateActionStreamInfo(newStreamEntity.id, newActionEntity)
     );
+    context.Asset.set(assetEntity);
     context.Stream.set(
       updateStreamRenounceInfo(event, newStreamEntity, newActionEntity)
     );
@@ -210,7 +224,7 @@ SablierV2LockupLinearContract_RenounceLockupStream_handler(
     const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
 
     const watcherEntity: WatcherEntity =
-      watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+      watcher ?? createWatcher(GLOBAL_WATCHER_ID, event.srcAddress.toString());
 
     let streamTokenId = event.params.streamId;
     let streamId = generateStreamId(event.srcAddress, streamTokenId);
@@ -247,7 +261,7 @@ SablierV2LockupLinearContract_Transfer_handler(({ event, context }) => {
   const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
 
   const watcherEntity: WatcherEntity =
-    watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+    watcher ?? createWatcher(GLOBAL_WATCHER_ID, event.srcAddress.toString());
 
   let streamTokenId = event.params.tokenId;
   let streamId = generateStreamId(event.srcAddress, streamTokenId);
@@ -310,7 +324,7 @@ SablierV2LockupLinearContract_WithdrawFromLockupStream_handler(
     const stream = context.Stream.get(streamId);
 
     const watcherEntity: WatcherEntity =
-      watcher ?? createWatcher(GLOBAL_WATCHER_ID);
+      watcher ?? createWatcher(GLOBAL_WATCHER_ID, event.srcAddress.toString());
 
     // create Actions entity
     let newActionEntity = createWithdrawAction(
