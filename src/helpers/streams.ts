@@ -31,9 +31,13 @@ export function generateStreamAlias(
   contract: ContractEntity,
   tokenId: bigint
 ): string {
-  let id = contract.alias
+  let contractInfo = getChainInfoForAddress(contract.id);
+  let chainId = contractInfo.chainId;
+  let aliasKey = contractInfo.aliasKey;
+
+  let id = aliasKey
     .concat("-")
-    .concat(getChainInfoForAddress(contract.id).chainId.toString())
+    .concat(chainId.toString())
     .concat("-")
     .concat(tokenId.toString());
 
