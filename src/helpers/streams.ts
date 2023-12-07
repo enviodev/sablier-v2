@@ -11,7 +11,7 @@ import {
 
 import { getChainInfoForAddress } from "./index";
 
-import { mul, div, add, minus } from "./maths";
+import { add, div, minus, mul } from "./maths";
 
 export function generateStreamId(
   contractAddress: string,
