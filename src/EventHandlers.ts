@@ -23,14 +23,14 @@ import {
 import { ContractEntity, StreamEntity, WatcherEntity } from "./src/Types.gen";
 
 import {
-  updateActionStreamInfo,
+  createApprovalAction,
+  createApprovalForAllAction,
   createCancelAction,
   createCreateAction,
   createRenounceAction,
   createTransferAction,
   createWithdrawAction,
-  createApprovalAction,
-  createApprovalForAllAction,
+  updateActionStreamInfo,
 } from "./helpers/action";
 import { createContract } from "./helpers/contract";
 import {
@@ -78,7 +78,10 @@ SablierV2LockupLinearContract_Approval_handler(({ event, context }) => {
 
   if (stream == undefined) {
     context.log.info(
-      `[SABLIER] Stream hasn't been registered before this approval event: ${streamId}`
+      `[SABLIER] Stream hasn't been registered before this Approval event: ${streamId}`
+    );
+    context.log.error(
+      "[SABLIER] - non existent stream, shouldn't be able to cancel a non existent stream"
     );
   }
 
@@ -138,7 +141,7 @@ SablierV2LockupLinearContract_CancelLockupStream_handler(
 
     if (stream == undefined) {
       context.log.info(
-        `[SABLIER] Stream hasn't been registered before this cancel event: ${streamId}`
+        `[SABLIER] Stream hasn't been registered before this Cancel event: ${streamId}`
       );
       context.log.error(
         "[SABLIER] - non existent stream, shouldn't be able to cancel a non existent stream"
@@ -233,10 +236,10 @@ SablierV2LockupLinearContract_RenounceLockupStream_handler(
 
     if (stream == undefined) {
       context.log.info(
-        `[SABLIER] Stream hasn't been registered before this cancel event: ${streamId}`
+        `[SABLIER] Stream hasn't been registered before this Renounce event: ${streamId}`
       );
       context.log.error(
-        "[SABLIER] - non existent stream, shouldn't be able to cancel a non existent stream"
+        "[SABLIER] - non existent stream, shouldn't be able to renounce a non existent stream"
       );
     } else {
       let action = createRenounceAction(
@@ -280,7 +283,7 @@ SablierV2LockupLinearContract_Transfer_handler(({ event, context }) => {
   // TODO investigate this further
   if (stream == undefined) {
     context.log.info(
-      `[SABLIER] Stream hasn't been registered before this transfer event: ${streamId}, ${event.transactionHash}`
+      `[SABLIER] Stream hasn't been registered before this Transfer event: ${streamId}, ${event.transactionHash}`
     );
     context.log.error(
       "[SABLIER] - non existent stream, shouldn't be able to transfer a non existent stream"
@@ -351,7 +354,7 @@ SablierV2LockupLinearContract_WithdrawFromLockupStream_handler(
 
     if (stream == undefined) {
       context.log.info(
-        `[SABLIER] Stream hasn't been registered before this withdraw event: ${streamId}`
+        `[SABLIER] Stream hasn't been registered before this Withdraw event: ${streamId}`
       );
       context.log.error(
         "[SABLIER] - non existent stream, shouldn't be able to withdraw from a non existent stream"

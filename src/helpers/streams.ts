@@ -1,12 +1,12 @@
 import {
-  StreamEntity,
-  ContractEntity,
   eventLog,
-  SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
-  WatcherEntity,
   ActionEntity,
-  SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
+  ContractEntity,
+  StreamEntity,
+  WatcherEntity,
+  SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
   SablierV2LockupLinearContract_TransferEvent_eventArgs,
+  SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";

@@ -10,8 +10,8 @@ networks:
         events:
           - event: Approval(address indexed owner, address indexed approved, uint256 indexed tokenId)
             requiredEntities:
-              - name: Watcher
               - name: Stream
+              - name: Watcher
           - event: ApprovalForAll(address indexed owner, address indexed operator, bool approved)
             requiredEntities:
               - name: Watcher

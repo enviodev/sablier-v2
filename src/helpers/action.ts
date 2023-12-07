@@ -2,13 +2,13 @@ import {
   eventLog,
   ActionEntity,
   WatcherEntity,
-  SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
-  SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs,
-  SablierV2LockupLinearContract_RenounceLockupStreamEvent_eventArgs,
-  SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
-  SablierV2LockupLinearContract_TransferEvent_eventArgs,
   SablierV2LockupLinearContract_ApprovalEvent_eventArgs,
   SablierV2LockupLinearContract_ApprovalForAllEvent_eventArgs,
+  SablierV2LockupLinearContract_CancelLockupStreamEvent_eventArgs,
+  SablierV2LockupLinearContract_CreateLockupLinearStreamEvent_eventArgs,
+  SablierV2LockupLinearContract_RenounceLockupStreamEvent_eventArgs,
+  SablierV2LockupLinearContract_TransferEvent_eventArgs,
+  SablierV2LockupLinearContract_WithdrawFromLockupStreamEvent_eventArgs,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";

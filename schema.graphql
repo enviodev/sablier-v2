@@ -1,7 +1,6 @@
 type Asset {
   "unique identifier resolving to the ERC20 asset/token address"
   id: ID!
-
   "address of the ERC20 asset/token"
   address: Bytes!
   "hardcoded chain id"
@@ -12,7 +11,6 @@ type Asset {
   name: String!
   "symbol of the ERC20 asset/token"
   symbol: String!
-
   "streams that rely on this asset/token"
   streams: [Stream!]! @derivedFrom(field: "asset")
 }
@@ -20,7 +18,6 @@ type Asset {
 type Contract {
   "unique identifier resolving to contract address"
   id: ID!
-
   "hardcoded alias, resolved by replacing the contract address from the id with the contract alias"
   alias: String!
   "address of the contract"
@@ -38,7 +35,6 @@ type Contract {
 type Action {
   "unique identifier resolving to transaction hash concatenated with the log index (there may be multiple actions per tx)"
   id: ID!
-
   "transaction details: block number"
   block: BigInt!
   "category of action e.g. Deposit or Withdraw"
@@ -51,14 +47,12 @@ type Action {
   hash: Bytes!
   "address that triggered the transaction"
   from: Bytes!
-
   "stream linked to this action (or null if this is a contract level action)"
   stream: Stream
   "unique global id tracked by the subgraph watcher"
   subgraphId: BigInt!
   "transaction details: timestamp"
   timestamp: BigInt!
-
   "address of an actor, differs based on action type e.g. for Create it resolves to the sender"
   addressA: Bytes
   "address of an actor, differs based on action type e.g. for Transfer it resolves to the new recipient"
@@ -72,14 +66,12 @@ type Action {
 type Stream {
   "unique identifier for the stream, resolving to the origin contract address concatenated with the chainId and the tokenId"
   id: ID!
-
   "hardcoded alias, resolved by replacing the contract address from the id with the contract alias"
   alias: String!
   "unique global id tracked by the subgraph watcher - 🚨 these may change if new contracts are added and the chronological order of streams changes"
   subgraphId: BigInt!
   "unique identifier for the stream released by the origin contract - same as the tokenId or streamId values given by the contract"
   tokenId: BigInt!
-
   "type of stream (for sorting reasons)"
   category: String!
   "hardcoded chain id"
@@ -90,7 +82,6 @@ type Stream {
   hash: Bytes!
   "timestamp of the stream creation (for sorting reasons)"
   timestamp: BigInt!
-
   "source of funds for the stream (anyone can create and fund a stream on any sender's behalf)"
   funder: Bytes!
   "manager of the stream, defined at creation by the funder (usually the same as the funder)"
@@ -99,15 +90,12 @@ type Stream {
   recipient: Bytes!
   "list of relevant stream parties (for filtering) - sender, recipient, possibly sender's"
   parties: [Bytes!]!
-
   "owner of the proxy when the stream is created through a PRBProxy (sender = proxy, proxender = owner(proxy))"
   proxender: Bytes
   "flag for streams created through a proxy"
   proxied: Boolean!
-
   "flag for linear streams with a cliff"
   cliff: Boolean!
-
   "asset (ERC20 token) supported by this stream"
   asset: Asset!
   "flag showing the cancelability of the stream (making it false is a one-way trip)"
@@ -122,29 +110,24 @@ type Stream {
   canceledAction: Action
   "timestamp for the when the stream was canceled"
   canceledTime: BigInt
-
   "timestamp for the start of the cliff, only available on linear streams"
   cliffTime: BigInt
   "derived amount of the cliff, only available on linear streams"
   cliffAmount: BigInt
-
   "timestamp for the end of the stream"
   endTime: BigInt!
   "timestamp for the start of the stream"
   startTime: BigInt!
   "snapshot of the duration (difference between end and start time)"
   duration: BigInt!
-
   "amount deposit in the stream (without fees)"
   depositAmount: BigInt!
   "amount resolving to the sum still inside the stream (regardless of it being locked or not) (difference between deposit and withdrawn pre-cancel)"
   intactAmount: BigInt!
   "amount resolving to the sum of all withdrawals"
   withdrawnAmount: BigInt!
-
   "actions triggered in the context of this stream"
   actions: [Action!]! @derivedFrom(field: "stream")
-
   "amount of fees paid to the broker"
   brokerFeeAmount: BigInt!
   "amount of fees paid to the protocol"
@@ -154,7 +137,6 @@ type Stream {
 type Segment {
   "unique id resolving to stream id concatenated with the position of the segment"
   id: ID!
-
   "position of the segment inside the array"
   position: BigInt!
   "stream upon which the segment is used"
