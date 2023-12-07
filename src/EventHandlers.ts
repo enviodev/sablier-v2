@@ -142,17 +142,7 @@ SablierV2LockupContract_CancelLockupStream_loader(({ event, context }) => {
 SablierV2LockupContract_CancelLockupStream_handler(({ event, context }) => {
   // proxy for if the indexer is live indexing
 
-  if (event.blockNumber == 50854904) {
-    context.log.info("The block log");
-  }
-
-  // if (event.blockTimestamp > indexerStartTimestamp) {
-  if (
-    event.transactionHash.toLowerCase() ==
-    "0x5a1d1ebd509fce257ca0291f35253a1cfbe241ce5dd6e9d582ac47065a23708c"
-  ) {
-    context.log.debug("The log debug");
-
+  if (event.blockTimestamp > indexerStartTimestamp) {
     context.log.info("Sending message to queue");
     sendMessageToQueue(
       `Stream was cancelled \n tx: ${event.transactionHash} \n sender: ${
