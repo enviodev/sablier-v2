@@ -63,7 +63,7 @@ import { getChainInfoForAddress } from "../src/helpers/index";
 
 const indexerStartTimestamp = Math.floor(new Date().getTime() / 1000);
 
-SablierV2LockupLinearContract_Approval_loader(({ event, context }) => {
+SablierV2LockupContract_Approval_loader(({ event, context }) => {
   context.Watcher.load(
     getChainInfoForAddress(event.srcAddress).chainId.toString()
   );
@@ -73,7 +73,7 @@ SablierV2LockupLinearContract_Approval_loader(({ event, context }) => {
   context.Stream.load(streamId, {});
 });
 
-SablierV2LockupLinearContract_Approval_handler(({ event, context }) => {
+SablierV2LockupContract_Approval_handler(({ event, context }) => {
   const watcher = context.Watcher.get(
     getChainInfoForAddress(event.srcAddress).chainId.toString()
   );
@@ -105,13 +105,13 @@ SablierV2LockupLinearContract_Approval_handler(({ event, context }) => {
   context.Watcher.set(updateWatcherActionIndex(watcherEntity));
 });
 
-SablierV2LockupLinearContract_ApprovalForAll_loader(({ event, context }) => {
+SablierV2LockupContract_ApprovalForAll_loader(({ event, context }) => {
   context.Watcher.load(
     getChainInfoForAddress(event.srcAddress).chainId.toString()
   );
 });
 
-SablierV2LockupLinearContract_ApprovalForAll_handler(({ event, context }) => {
+SablierV2LockupContract_ApprovalForAll_handler(({ event, context }) => {
   const watcher = context.Watcher.get(
     getChainInfoForAddress(event.srcAddress).chainId.toString()
   );
@@ -131,17 +131,36 @@ SablierV2LockupLinearContract_ApprovalForAll_handler(({ event, context }) => {
 });
 
 SablierV2LockupContract_CancelLockupStream_loader(({ event, context }) => {
-  context.Watcher.load(GLOBAL_WATCHER_ID);
+  context.Watcher.load(
+    getChainInfoForAddress(event.srcAddress).chainId.toString()
+  );
   let streamTokenId = event.params.streamId;
   let streamId = generateStreamId(event.srcAddress, streamTokenId);
   context.Stream.load(streamId, {});
 });
 
 SablierV2LockupContract_CancelLockupStream_handler(({ event, context }) => {
-  const watcher = context.Watcher.get(GLOBAL_WATCHER_ID);
+  const watcher = context.Watcher.get(
+    getChainInfoForAddress(event.srcAddress).chainId.toString()
+  );
+
+  // proxy for if the indexer is live indexing
+  if (event.blockTimestamp > indexerStartTimestamp) {
+    context.log.info("Sending message to queue");
+    sendMessageToQueue(
+      `Stream was cancelled \n tx: ${event.transactionHash} \n sender: ${
+        event.params.sender
+      } \n recipient ${event.params.recipient} \n senderAmount: ${
+        event.params.senderAmount
+      } \n recipientAmount: ${event.params.recipientAmount} \n streamId: ${
+        event.params.streamId
+      } \n chainId: ${getChainInfoForAddress(event.srcAddress).chainId} `
+    );
+  }
 
   const watcherEntity: WatcherEntity =
-    watcher ?? createWatcher(GLOBAL_WATCHER_ID, event.srcAddress.toString());
+    watcher ??
+    createWatcher(getChainInfoForAddress(event.srcAddress).chainId.toString());
 
   let actionEntity = createCancelAction(
     event,
@@ -177,7 +196,6 @@ SablierV2LockupContract_CreateLockupDynamicStream_loader(
     );
     let streamTokenId = event.params.streamId;
     let streamId = generateStreamId(event.srcAddress, streamTokenId);
-    context.Stream.load(streamId, {});
   }
 );
 
@@ -185,20 +203,6 @@ SablierV2LockupContract_CreateLockupDynamicStream_handler(
   ({ event, context }) => {
     const asset = context.Asset.get(event.params.asset.toString());
     const contract = context.Contract.get(event.srcAddress.toString());
-    // proxy for if the indexer is live indexing
-    if (event.blockTimestamp > indexerStartTimestamp) {
-      context.log.info("Sending message to queue");
-      sendMessageToQueue(
-        `Stream was cancelled \n tx: ${event.transactionHash} \n sender: ${
-          event.params.sender
-        } \n recipient ${event.params.recipient} \n senderAmount: ${
-          event.params.senderAmount
-        } \n recipientAmount: ${event.params.recipientAmount} \n streamId: ${
-          event.params.streamId
-        } \n chainId: ${getChainInfoForAddress(event.srcAddress).chainId} `
-      );
-    }
-
     const watcher = context.Watcher.get(
       getChainInfoForAddress(event.srcAddress).chainId.toString()
     );
@@ -308,25 +312,22 @@ SablierV2LockupContract_CreateLockupLinearStream_handler(
   }
 );
 
-SablierV2LockupLinearContract_RenounceLockupStream_loader(
-  ({ event, context }) => {
-    let streamTokenId = event.params.streamId;
-    let streamId = generateStreamId(event.srcAddress, streamTokenId);
-    context.Stream.load(streamId, {});
-    context.Watcher.load(
-      getChainInfoForAddress(event.srcAddress).chainId.toString()
-    );
-  }
-);
+SablierV2LockupContract_RenounceLockupStream_loader(({ event, context }) => {
+  let streamTokenId = event.params.streamId;
+  let streamId = generateStreamId(event.srcAddress, streamTokenId);
+  context.Stream.load(streamId, {});
+  context.Watcher.load(
+    getChainInfoForAddress(event.srcAddress).chainId.toString()
+  );
+});
 
-SablierV2LockupLinearContract_RenounceLockupStream_handler(
-  ({ event, context }) => {
-    const watcher = context.Watcher.get(
-      getChainInfoForAddress(event.srcAddress).chainId.toString()
-    );
+SablierV2LockupContract_RenounceLockupStream_handler(({ event, context }) => {
+  const watcher = context.Watcher.get(
+    getChainInfoForAddress(event.srcAddress).chainId.toString()
+  );
 
-    const watcherEntity: WatcherEntity =
-      watcher ?? createWatcher(event.srcAddress.toString());
+  const watcherEntity: WatcherEntity =
+    watcher ?? createWatcher(event.srcAddress.toString());
 
   let streamTokenId = event.params.streamId;
   let streamId = generateStreamId(event.srcAddress, streamTokenId);
@@ -360,7 +361,7 @@ SablierV2LockupContract_Transfer_loader(({ event, context }) => {
   );
 });
 
-SablierV2LockupLinearContract_Transfer_handler(({ event, context }) => {
+SablierV2LockupContract_Transfer_handler(({ event, context }) => {
   const watcher = context.Watcher.get(
     getChainInfoForAddress(event.srcAddress).chainId.toString()
   );
