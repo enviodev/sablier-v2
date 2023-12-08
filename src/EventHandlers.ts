@@ -61,7 +61,7 @@ import sendMessageToQueue from "./rabbitmq/send";
 
 import { getChainInfoForAddress } from "../src/helpers/index";
 
-const indexerStartTimestamp = Math.floor(new Date().getTime() / 1000);
+export const indexerStartTimestamp = Math.floor(new Date().getTime() / 1000);
 
 SablierV2LockupContract_Approval_loader(({ event, context }) => {
   context.Watcher.load(
@@ -247,7 +247,9 @@ SablierV2LockupContract_CreateLockupDynamicStream_handler(
     );
     context.Contract.set(contractEntity);
     context.Watcher.set(
-      updateWatcherActionIndex(updateWatcherStreamIndex(watcherEntity))
+      updateWatcherActionIndex(
+        updateWatcherStreamIndex(watcherEntity, { event, context })
+      )
     );
   }
 );
@@ -308,7 +310,9 @@ SablierV2LockupContract_CreateLockupLinearStream_handler(
     );
     context.Contract.set(contractEntity);
     context.Watcher.set(
-      updateWatcherActionIndex(updateWatcherStreamIndex(watcherEntity))
+      updateWatcherActionIndex(
+        updateWatcherStreamIndex(watcherEntity, { event, context })
+      )
     );
   }
 );

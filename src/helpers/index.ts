@@ -60,7 +60,7 @@ const addressToChainMapping: AddressToChainMapping = {
   // Polygon (SablierV2LockupLinear)
   "0x67422c3e36a908d5c3237e9cffeb40bde7060f6e": {
     chainId: 137,
-    chainName: "matic",
+    chainName: "polygon",
     aliasKey: "ll",
   },
   // Scroll (SablierV2LockupLinear)
