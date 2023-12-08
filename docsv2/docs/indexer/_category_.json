@@ -1,0 +1,8 @@
+{
+  "label": "Envio Indexer",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "The Sablier V2 Envio Multi-chain Indexer indexes, organizes and aggregates data from the Sablier V2 smart contracts deployed across multiple EVM networks."
+  }
+}
