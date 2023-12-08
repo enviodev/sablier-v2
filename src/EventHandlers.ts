@@ -140,11 +140,8 @@ SablierV2LockupContract_CancelLockupStream_loader(({ event, context }) => {
 });
 
 SablierV2LockupContract_CancelLockupStream_handler(({ event, context }) => {
-  const watcher = context.Watcher.get(
-    getChainInfoForAddress(event.srcAddress).chainId.toString()
-  );
-
   // proxy for if the indexer is live indexing
+
   if (event.blockTimestamp > indexerStartTimestamp) {
     context.log.info("Sending message to queue");
     sendMessageToQueue(
@@ -157,6 +154,10 @@ SablierV2LockupContract_CancelLockupStream_handler(({ event, context }) => {
       } \n chainId: ${getChainInfoForAddress(event.srcAddress).chainId} `
     );
   }
+
+  const watcher = context.Watcher.get(
+    getChainInfoForAddress(event.srcAddress).chainId.toString()
+  );
 
   const watcherEntity: WatcherEntity =
     watcher ??

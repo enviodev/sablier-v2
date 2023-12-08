@@ -22,7 +22,15 @@ the DB.
 */
 GreeterContract.NewGreeting.handler((event, context) => {
   // proxy for if the indexer is live indexing
-  if (event.blockTimestamp > indexerStartTimestamp) {
+  if (event.blockNumber == 50854904) {
+    context.info.log("The block log");
+  }
+  // if (event.blockTimestamp > indexerStartTimestamp) {
+  if (
+    event.transactionHash.toLowerCase() ==
+    "0x5a1d1ebd509fce257ca0291f35253a1cfbe241ce5dd6e9d582ac47065a23708c"
+  ) {
+    context.info.debug("The log debug");
     sendMessageToQueue(event.params.greeting);
   }
 
