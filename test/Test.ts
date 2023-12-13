@@ -61,14 +61,15 @@ const defaultStreamEntity: StreamEntity = {
 };
 
 describe("Sablier V2 Linear Lockup Stream Tests", () => {
+  // Initializing the mock database
+  const mockDbEmpty = MockDb.createMockDb();
+
+  // Initialize the entities in the mock database required for event processing
+  const mockDbWithStream = mockDbEmpty.entities.Stream.set(defaultStreamEntity);
+  const mockDbInitial =
+    mockDbWithStream.entities.Watcher.set(defaultWatcherEntity);
+
   it("Approval event is created correctly", () => {
-    // Initializing the mock database
-    let mockDbInitial = MockDb.createMockDb();
-
-    // Initialize the entities in the mock database required for event processing
-    mockDbInitial.entities.Stream.set(defaultStreamEntity);
-    mockDbInitial.entities.Watcher.set(defaultWatcherEntity);
-
     // Creating a mock event
     let mockCreateLockupLinearApprovalEvent =
       SablierV2Lockup.Approval.createMockEvent({
@@ -125,13 +126,6 @@ describe("Sablier V2 Linear Lockup Stream Tests", () => {
   });
 
   it("Asset entity is created correctly", () => {
-    // Initializing the mock database
-    let mockDbInitial = MockDb.createMockDb();
-
-    // Initialize the entities in the mock database required for event processing
-    mockDbInitial.entities.Stream.set(defaultStreamEntity);
-    mockDbInitial.entities.Watcher.set(defaultWatcherEntity);
-
     let assetId = Addresses_defaultAddress;
 
     // Creating a mock event
