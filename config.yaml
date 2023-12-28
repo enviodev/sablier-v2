@@ -55,13 +55,6 @@ networks:
         address:
           - 0xFDD9d122B451F549f48c4942c6fa6646D849e8C1
           - 0xf390cE6f54e4dc7C5A5f7f8689062b7591F7111d
-  # - id: 43114 # Avalanche
-  #   start_block: 0
-  #   contracts:
-  #     - name: SablierV2Lockup
-  #       address:
-  #         - 0x610346E9088AFA70D6B03e96A800B3267E75cA19
-  #         - 0x665d1C8337F1035cfBe13DD94bB669110b975f5F
   - id: 8453 # Base
     start_block: 0
     contracts:
