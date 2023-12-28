@@ -1,4 +1,5 @@
-name: Sablier V2
+# https://github.com/sablier-labs/v2-docs/blob/main/docs/contracts/v2/02-deployments.md
+name: Sablier V2.1
 contracts:
   - name: SablierV2Lockup
     handler: src/EventHandlers.ts
@@ -45,61 +46,61 @@ networks:
     contracts:
       - name: SablierV2Lockup
         address:
-          - 0xB10daee1FCF62243aE27776D7a92D39dC8740f95
-          - 0x39EFdC3dbB57B2388CcC4bb40aC4CB1226Bc9E44
+          - 0xAFb979d9afAd1aD27C5eFf4E27226E3AB9e5dCC9
+          - 0x7CC7e125d83A581ff438608490Cc0f7bDff79127
   - id: 42161 # Arbitrum
     start_block: 0
     contracts:
       - name: SablierV2Lockup
         address:
-          - 0x197D655F3be03903fD25e7828c3534504bfe525e
-          - 0xA9EfBEf1A35fF80041F567391bdc9813b2D50197
-  - id: 43114 # Avalanche
-    start_block: 0
-    contracts:
-      - name: SablierV2Lockup
-        address:
-          - 0x610346E9088AFA70D6B03e96A800B3267E75cA19
-          - 0x665d1C8337F1035cfBe13DD94bB669110b975f5F
+          - 0xFDD9d122B451F549f48c4942c6fa6646D849e8C1
+          - 0xf390cE6f54e4dc7C5A5f7f8689062b7591F7111d
+  # - id: 43114 # Avalanche
+  #   start_block: 0
+  #   contracts:
+  #     - name: SablierV2Lockup
+  #       address:
+  #         - 0x610346E9088AFA70D6B03e96A800B3267E75cA19
+  #         - 0x665d1C8337F1035cfBe13DD94bB669110b975f5F
   - id: 8453 # Base
     start_block: 0
     contracts:
       - name: SablierV2Lockup
         address:
-          - 0x6b9a46C8377f21517E65fa3899b3A9Fab19D17f5
-          - 0x645B00960Dc352e699F89a81Fc845C0C645231cf
-  # - id: 56 # BSC
-  #   start_block: 0
-  #   contracts:
-  #     - name: SablierV2Lockup
-  #       address:
-  #         - 0x3FE4333f62A75c2a85C8211c6AeFd1b9Bfde6e51
-  #         - 0xF2f3feF2454DcA59ECA929D2D8cD2a8669Cc6214
+          - 0xFCF737582d167c7D20A336532eb8BCcA8CF8e350
+          - 0x461E13056a3a3265CEF4c593F01b2e960755dE91
+  - id: 56 # BSC
+    start_block: 0
+    contracts:
+      - name: SablierV2Lockup
+        address:
+          - 0x14c35E126d75234a90c9fb185BF8ad3eDB6A90D2
+          - 0xf900c5E3aA95B59Cc976e6bc9c0998618729a5fa
   - id: 100 # Gnosis
     start_block: 0
     contracts:
       - name: SablierV2Lockup
         address:
-          - 0x685E92c9cA2bB23f1B596d0a7D749c0603e88585
-          - 0xeb148E4ec13aaA65328c0BA089a278138E9E53F9
+          - 0xce49854a647a1723e8Fb7CC3D190CAB29A44aB48
+          - 0x1DF83C7682080B0f0c26a20C6C9CB8623e0Df24E
   - id: 10 # Optimism
     start_block: 0
     contracts:
       - name: SablierV2Lockup
         address:
-          - 0xB923aBdCA17Aed90EB5EC5E407bd37164f632bFD
-          - 0x6f68516c21E248cdDfaf4898e66b2b0Adee0e0d6
+          - 0x4b45090152a5731b5bc71b5baF71E60e05B33867
+          - 0xd6920c1094eABC4b71f3dC411A1566f64f4c206e
   - id: 137 # Polygon
     start_block: 0
     contracts:
       - name: SablierV2Lockup
         address:
-          - 0x67422C3E36A908D5C3237e9cFfEB40bDE7060f6E
-          - 0x7313AdDb53f96a4f710D3b91645c62B434190725
+          - 0x5f0e1dea4A635976ef51eC2a2ED41490d1eBa003
+          - 0xB194c7278C627D52E440316b74C5F24FC70c1565
   - id: 534352 # Scroll
     start_block: 0
     contracts:
       - name: SablierV2Lockup
         address:
-          - 0x80640ca758615ee83801EC43452feEA09a202D33
-          - 0xde6a30D851eFD0Fc2a9C922F294801Cfd5FCB3A1
+          - 0x57e14AB4DAd920548899d86B54AD47Ea27F00987
+          - 0xAaff2D11f9e7Cd2A9cDC674931fAC0358a165995
