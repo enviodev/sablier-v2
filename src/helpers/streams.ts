@@ -62,6 +62,7 @@ function createStream(
 
   let partialStreamEntity: StreamEntity = {
     id: id,
+    version: chainInfo.version,
     tokenId: tokenId,
     alias: alias,
     contract: contract.id,
@@ -89,6 +90,7 @@ function createStream(
     endTime: 0n,
     startTime: event.params.range[0],
     duration: 0n,
+    transferable: event.params.transferable,
     depositAmount: event.params.amounts[0],
     intactAmount: event.params.amounts[0],
     withdrawnAmount: 0n,
