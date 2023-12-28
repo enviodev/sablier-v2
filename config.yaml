@@ -11,16 +11,16 @@ contracts:
       - event: ApprovalForAll(address indexed owner, address indexed operator, bool approved)
         requiredEntities:
           - name: Watcher
-      - event: CancelLockupStream(uint256 indexed streamId, address indexed sender, address indexed recipient, uint128 senderAmount, uint128 recipientAmount)
+      - event: CancelLockupStream(uint256 streamId, address indexed sender, address indexed recipient, address indexed asset, uint128 senderAmount, uint128 recipientAmount)
         requiredEntities:
           - name: Stream
           - name: Watcher
-      - event: CreateLockupLinearStream(uint256 streamId, address funder, address indexed sender, address indexed recipient, (uint128,uint128,uint128) amounts, address indexed asset, bool cancelable, (uint40,uint40,uint40) range, address broker)
+      - event: CreateLockupLinearStream(uint256 streamId, address funder, address indexed sender, address indexed recipient, (uint128,uint128,uint128) amounts, address indexed asset, bool cancelable, bool transferable, (uint40,uint40,uint40) range, address broker)
         requiredEntities:
           - name: Asset
           - name: Contract
           - name: Watcher
-      - event: CreateLockupDynamicStream(uint256 streamId, address funder, address indexed sender, address indexed recipient, (uint128,uint128,uint128) amounts, address indexed asset, bool cancelable, (uint128,uint64,uint40)[] segments, (uint40,uint40) range, address broker)
+      - event: event CreateLockupDynamicStream(uint256 streamId, address funder, address indexed sender, address indexed recipient, (uint128,uint128,uint128) amounts, address indexed asset, bool cancelable, bool transferable, (uint128,uint64,uint40)[] segments, (uint40,uint40) range, address broker)
         requiredEntities:
           - name: Asset
           - name: Contract
@@ -36,7 +36,7 @@ contracts:
       - event: TransferAdmin(address indexed oldAdmin, address indexed newAdmin)
         requiredEntities:
           - name: Contract
-      - event: WithdrawFromLockupStream(uint256 indexed streamId, address indexed to, uint128 amount)
+      - event: WithdrawFromLockupStream(uint256 indexed streamId, address indexed to, address indexed asset, uint128 amount)
         requiredEntities:
           - name: Stream
           - name: Watcher
@@ -48,52 +48,52 @@ networks:
         address:
           - 0xAFb979d9afAd1aD27C5eFf4E27226E3AB9e5dCC9
           - 0x7CC7e125d83A581ff438608490Cc0f7bDff79127
-  - id: 42161 # Arbitrum
-    start_block: 0
-    contracts:
-      - name: SablierV2Lockup
-        address:
-          - 0xFDD9d122B451F549f48c4942c6fa6646D849e8C1
-          - 0xf390cE6f54e4dc7C5A5f7f8689062b7591F7111d
-  - id: 8453 # Base
-    start_block: 0
-    contracts:
-      - name: SablierV2Lockup
-        address:
-          - 0xFCF737582d167c7D20A336532eb8BCcA8CF8e350
-          - 0x461E13056a3a3265CEF4c593F01b2e960755dE91
-  - id: 56 # BSC
-    start_block: 0
-    contracts:
-      - name: SablierV2Lockup
-        address:
-          - 0x14c35E126d75234a90c9fb185BF8ad3eDB6A90D2
-          - 0xf900c5E3aA95B59Cc976e6bc9c0998618729a5fa
-  - id: 100 # Gnosis
-    start_block: 0
-    contracts:
-      - name: SablierV2Lockup
-        address:
-          - 0xce49854a647a1723e8Fb7CC3D190CAB29A44aB48
-          - 0x1DF83C7682080B0f0c26a20C6C9CB8623e0Df24E
-  - id: 10 # Optimism
-    start_block: 0
-    contracts:
-      - name: SablierV2Lockup
-        address:
-          - 0x4b45090152a5731b5bc71b5baF71E60e05B33867
-          - 0xd6920c1094eABC4b71f3dC411A1566f64f4c206e
-  - id: 137 # Polygon
-    start_block: 0
-    contracts:
-      - name: SablierV2Lockup
-        address:
-          - 0x5f0e1dea4A635976ef51eC2a2ED41490d1eBa003
-          - 0xB194c7278C627D52E440316b74C5F24FC70c1565
-  - id: 534352 # Scroll
-    start_block: 0
-    contracts:
-      - name: SablierV2Lockup
-        address:
-          - 0x57e14AB4DAd920548899d86B54AD47Ea27F00987
-          - 0xAaff2D11f9e7Cd2A9cDC674931fAC0358a165995
+  # - id: 42161 # Arbitrum
+  #   start_block: 0
+  #   contracts:
+  #     - name: SablierV2Lockup
+  #       address:
+  #         - 0xFDD9d122B451F549f48c4942c6fa6646D849e8C1
+  #         - 0xf390cE6f54e4dc7C5A5f7f8689062b7591F7111d
+  # - id: 8453 # Base
+  #   start_block: 0
+  #   contracts:
+  #     - name: SablierV2Lockup
+  #       address:
+  #         - 0xFCF737582d167c7D20A336532eb8BCcA8CF8e350
+  #         - 0x461E13056a3a3265CEF4c593F01b2e960755dE91
+  # - id: 56 # BSC
+  #   start_block: 0
+  #   contracts:
+  #     - name: SablierV2Lockup
+  #       address:
+  #         - 0x14c35E126d75234a90c9fb185BF8ad3eDB6A90D2
+  #         - 0xf900c5E3aA95B59Cc976e6bc9c0998618729a5fa
+  # - id: 100 # Gnosis
+  #   start_block: 0
+  #   contracts:
+  #     - name: SablierV2Lockup
+  #       address:
+  #         - 0xce49854a647a1723e8Fb7CC3D190CAB29A44aB48
+  #         - 0x1DF83C7682080B0f0c26a20C6C9CB8623e0Df24E
+  # - id: 10 # Optimism
+  #   start_block: 0
+  #   contracts:
+  #     - name: SablierV2Lockup
+  #       address:
+  #         - 0x4b45090152a5731b5bc71b5baF71E60e05B33867
+  #         - 0xd6920c1094eABC4b71f3dC411A1566f64f4c206e
+  # - id: 137 # Polygon
+  #   start_block: 0
+  #   contracts:
+  #     - name: SablierV2Lockup
+  #       address:
+  #         - 0x5f0e1dea4A635976ef51eC2a2ED41490d1eBa003
+  #         - 0xB194c7278C627D52E440316b74C5F24FC70c1565
+  # - id: 534352 # Scroll
+  #   start_block: 0
+  #   contracts:
+  #     - name: SablierV2Lockup
+  #       address:
+  #         - 0x57e14AB4DAd920548899d86B54AD47Ea27F00987
+  #         - 0xAaff2D11f9e7Cd2A9cDC674931fAC0358a165995
