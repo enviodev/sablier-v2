@@ -11,6 +11,7 @@ export function createContract(address: string): ContractEntity {
 
   const contractEntity: ContractEntity = {
     id: address,
+    version: chainInfo.version,
     alias: chainInfo.aliasKey + "-" + address,
     chainId: BigInt(chainInfo.chainId),
     chainName: chainInfo.chainName,
