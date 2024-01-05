@@ -8,8 +8,8 @@ import {
   SablierV2LockupContract_ApprovalForAll_handler,
   SablierV2LockupContract_CancelLockupStream_loader,
   SablierV2LockupContract_CancelLockupStream_handler,
-  // SablierV2LockupContract_CreateLockupDynamicStream_handler,
-  // SablierV2LockupContract_CreateLockupDynamicStream_loader,
+  SablierV2LockupContract_CreateLockupDynamicStream_handler,
+  SablierV2LockupContract_CreateLockupDynamicStream_loader,
   SablierV2LockupContract_CreateLockupLinearStream_handler,
   SablierV2LockupContract_CreateLockupLinearStream_loader,
   SablierV2LockupContract_RenounceLockupStream_loader,
@@ -188,71 +188,71 @@ SablierV2LockupContract_CancelLockupStream_handler(({ event, context }) => {
   context.Watcher.set(updateWatcherActionIndex(watcherEntity));
 });
 
-// SablierV2LockupContract_CreateLockupDynamicStream_loader(
-//   ({ event, context }) => {
-//     context.Asset.load(event.params.asset.toString());
-//     context.Contract.load(event.srcAddress.toString());
-//     context.Watcher.load(
-//       getChainInfoForAddress(event.srcAddress).chainId.toString()
-//     );
-//     let streamTokenId = event.params.streamId;
-//     let streamId = generateStreamId(event.srcAddress, streamTokenId);
-//   }
-// );
+SablierV2LockupContract_CreateLockupDynamicStream_loader(
+  ({ event, context }) => {
+    context.Asset.load(event.params.asset.toString());
+    context.Contract.load(event.srcAddress.toString());
+    context.Watcher.load(
+      getChainInfoForAddress(event.srcAddress).chainId.toString()
+    );
+    let streamTokenId = event.params.streamId;
+    let streamId = generateStreamId(event.srcAddress, streamTokenId);
+  }
+);
 
-// SablierV2LockupContract_CreateLockupDynamicStream_handler(
-//   ({ event, context }) => {
-//     const asset = context.Asset.get(event.params.asset.toString());
-//     const contract = context.Contract.get(event.srcAddress.toString());
-//     const watcher = context.Watcher.get(
-//       getChainInfoForAddress(event.srcAddress).chainId.toString()
-//     );
+SablierV2LockupContract_CreateLockupDynamicStream_handler(
+  ({ event, context }) => {
+    const asset = context.Asset.get(event.params.asset.toString());
+    const contract = context.Contract.get(event.srcAddress.toString());
+    const watcher = context.Watcher.get(
+      getChainInfoForAddress(event.srcAddress).chainId.toString()
+    );
 
-//     const watcherEntity: WatcherEntity =
-//       watcher ?? createWatcher(event.srcAddress.toString());
+    const watcherEntity: WatcherEntity =
+      watcher ?? createWatcher(event.srcAddress.toString());
 
-//     const assetEntity: AssetEntity =
-//       asset ??
-//       createAsset(event.params.asset.toString(), watcherEntity.chainId);
+    const assetEntity: AssetEntity =
+      asset ??
+      createAsset(event.params.asset.toString(), watcherEntity.chainId);
 
-//     const contractEntity: ContractEntity =
-//       contract ?? createContract(event.srcAddress.toString());
+    const contractEntity: ContractEntity =
+      contract ?? createContract(event.srcAddress.toString());
 
-//     // Create the stream entity
-//     let newStreamEntity: StreamEntity = createDynamicStream(
-//       event,
-//       watcherEntity,
-//       contractEntity,
-//       assetEntity
-//     );
+    // Create the stream entity
+    let newStreamEntity: StreamEntity = createDynamicStream(
+      event,
+      watcherEntity,
+      contractEntity,
+      assetEntity
+    );
 
-//     // Create the action entity
-//     let newActionEntity = createCreateAction(
-//       event,
-//       watcherEntity,
-//       event.srcAddress.toString()
-//     );
+    // Create the action entity
+    let newActionEntity = createCreateAction(
+      event,
+      watcherEntity,
+      event.srcAddress.toString()
+    );
 
-//     // Updating entity values
-//     context.Action.set(
-//       updateActionStreamInfo(newStreamEntity.id, newActionEntity)
-//     );
-//     context.Asset.set(assetEntity);
-//     context.Stream.set(
-//       updateStreamRenounceInfoAtCreation(
-//         event,
-//         newStreamEntity,
-//         newActionEntity
-//       )
-//     );
-//     context.Contract.set(contractEntity);
-//     context.Watcher.set(
-//       updateWatcherActionIndex(
-//         updateWatcherStreamIndex(watcherEntity, { event, context })
-//       )
-//     );
-//   }
-// );
+    // Updating entity values
+    context.Action.set(
+      updateActionStreamInfo(newStreamEntity.id, newActionEntity)
+    );
+    context.Asset.set(assetEntity);
+    context.Stream.set(
+      updateStreamRenounceInfoAtCreation(
+        event,
+        newStreamEntity,
+        newActionEntity
+      )
+    );
+    context.Contract.set(contractEntity);
+    context.Watcher.set(
+      updateWatcherActionIndex(
+        updateWatcherStreamIndex(watcherEntity, { event, context })
+      )
+    );
+  }
+);
 
 SablierV2LockupContract_CreateLockupLinearStream_loader(
   ({ event, context }) => {
