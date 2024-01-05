@@ -8,6 +8,7 @@
     "codegen": "envio codegen",
     "dev": "envio dev",
     "test": "mocha --require ts-node/register test/**/*.ts",
+    "compare": "node test/comparisons/index.js",
     "start": "ts-node generated/src/Index.bs.js"
   },
   "devDependencies": {
@@ -18,7 +19,7 @@
     "chai": "4.3.10",
     "ethers": "6.8.0",
     "mocha": "10.2.0",
-    "rescript": "10.1.4"
+    "rescript": "10.1.4"    
   },
   "dependencies": {
     "ts-node": "10.9.1",

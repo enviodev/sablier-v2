@@ -21,6 +21,7 @@ export function generateStreamId(
 ): string {
   let id = ""
     .concat(contractAddress)
+    .toLowerCase()
     .concat("-")
     .concat(getChainInfoForAddress(contractAddress).chainId.toString())
     .concat("-")
@@ -70,10 +71,13 @@ function createStream(
     hash: event.transactionHash,
     timestamp: BigInt(event.blockTimestamp),
     category: "",
-    funder: event.params.funder,
-    sender: event.params.sender,
-    recipient: event.params.recipient,
-    parties: [event.params.sender, event.params.recipient],
+    funder: event.params.funder.toLowerCase(),
+    sender: event.params.sender.toLowerCase(),
+    recipient: event.params.recipient.toLowerCase(),
+    parties: [
+      event.params.sender.toLowerCase(),
+      event.params.recipient.toLowerCase(),
+    ],
     cancelable: event.params.cancelable,
     proxender: "",
     chainId: BigInt(chainInfo.chainId),
