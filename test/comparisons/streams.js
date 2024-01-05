@@ -1,3 +1,6 @@
+let { logObjectDifference } = require("./helpers");
+let { fetchQuery } = require("./fetcher");
+
 // const testId = "0x39efdc3dbb57b2388ccc4bb40ac4cb1226bc9e44-1-1"; // LD
 // const testId = "0xafb979d9afad1ad27c5eff4e27226e3ab9e5dcc9-1-1"; // LL
 const testId = "0xafb979d9afad1ad27c5eff4e27226e3ab9e5dcc9-1-5";
@@ -36,6 +39,11 @@ const subgraphQuery = `
       transferable
       version
       withdrawnAmount
+      canceledAction
+      brokerFeeAmount
+      asset
+      contract
+      renounceAction
     }
   }
 `;
@@ -73,79 +81,28 @@ const envioQuery = `
       transferable
       version
       withdrawnAmount
+      canceledAction
+      brokerFeeAmount
+      asset
+      contract
+      renounceAction
     }
   }
 `;
 
-const fetchGraphQL = async (endpoint, query, operationName, variables) => {
-  const result = await fetch(endpoint, {
-    method: "POST",
-    body: JSON.stringify({
-      query: query,
-      variables: variables,
-      operationName: operationName,
-    }),
-  });
-
-  return await result.json();
-};
-
-const fetchTheGraphQuery = async () => {
-  const { errors, data } = await fetchGraphQL(
-    "https://api.thegraph.com/subgraphs/name/sablier-labs/sablier-v2",
-    subgraphQuery,
-    "MyQuery",
-    {}
-  );
-
-  if (errors) {
-    console.log("error fetching from the graph");
-    console.error(errors);
-  }
-
-  return data;
-};
-
-const fetchEnvioQuery = async () => {
-  const { errors, data } = await fetchGraphQL(
-    "http://localhost:8080/v1/graphql",
-    envioQuery,
-    "MyQuery",
-    {}
-  );
-
-  if (errors) {
-    console.log("error fetching from envio");
-    console.error(errors);
-  }
-
-  return data;
-};
-
-/////////////////////////////
-
-function logObjectDifference(obj1, obj2) {
-  const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
-
-  const uniqueKeys = new Set([...keys1, ...keys2]);
-
-  uniqueKeys.forEach((key) => {
-    if (obj1[key] !== obj2[key]) {
-      console.log(`Difference in key '${key}':`);
-      console.log(`   Graph data: ${obj1[key]}`);
-      console.log(`   Envio data: ${obj2[key]}`);
-    }
-  });
-}
-
 const compare = async () => {
   // fetch data from theGraph by Id
-  let graphData = await fetchTheGraphQuery();
+  let graphData = await fetchQuery(
+    "https://api.thegraph.com/subgraphs/name/sablier-labs/sablier-v2",
+    subgraphQuery
+  );
   // fetch data from hasura by Id
-  let envioData = await fetchEnvioQuery();
-  // compare data
+  let envioData = await fetchQuery(
+    "http://localhost:8080/v1/graphql",
+    envioQuery
+  );
 
+  // compare data
   logObjectDifference(graphData.stream, envioData.Stream[0]);
 };
 
