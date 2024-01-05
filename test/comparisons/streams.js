@@ -91,12 +91,13 @@ const envioQuery = `
 `;
 
 const compare = async () => {
+  console.log("Stream comparison");
   // fetch data from theGraph by Id
   let graphData = await fetchQuery(
     "https://api.thegraph.com/subgraphs/name/sablier-labs/sablier-v2",
     subgraphQuery
   );
-  // fetch data from hasura by Id
+  // fetch data from envio by Id
   let envioData = await fetchQuery(
     "http://localhost:8080/v1/graphql",
     envioQuery
