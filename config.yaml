@@ -20,7 +20,7 @@ contracts:
           - name: Asset
           - name: Contract
           - name: Watcher
-      - event: event CreateLockupDynamicStream(uint256 streamId, address funder, address indexed sender, address indexed recipient, (uint128,uint128,uint128) amounts, address indexed asset, bool cancelable, bool transferable, (uint128,uint64,uint40)[] segments, (uint40,uint40) range, address broker)
+      - event: CreateLockupDynamicStream(uint256 streamId, address funder, address indexed sender, address indexed recipient, (uint128,uint128,uint128) amounts, address indexed asset, bool cancelable, bool transferable, (uint128,uint64,uint40)[] segments, (uint40,uint40) range, address broker)
         requiredEntities:
           - name: Asset
           - name: Contract
