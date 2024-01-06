@@ -60,6 +60,10 @@ function createStream(
 
   let alias = generateStreamAlias(contract, tokenId);
   let chainInfo = getChainInfoForAddress(event.srcAddress.toString());
+  let versionCompatableTransferable: boolean =
+    "transferable" in event.params
+      ? Boolean(event.params["transferable"])
+      : false; // all v2.0 will be false
 
   let partialStreamEntity: StreamEntity = {
     id: id,
@@ -94,7 +98,7 @@ function createStream(
     endTime: 0n,
     startTime: event.params.range[0],
     duration: 0n,
-    transferable: event.params.transferable,
+    transferable: versionCompatableTransferable,
     depositAmount: event.params.amounts[0],
     intactAmount: event.params.amounts[0],
     withdrawnAmount: 0n,

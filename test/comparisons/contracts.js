@@ -1,36 +1,38 @@
 let { logObjectDifference } = require("./helpers");
 let { fetchQuery } = require("./fetcher");
 
-const testId = 1;
+const testId = "0xB10daee1FCF62243aE27776D7a92D39dC8740f95";
 
 const subgraphQuery = `
   query MyQuery {
-    watcher(id: ${testId}) {
-      actionIndex
-      chainId
+    contract(id: "${testId}") {
+      address
+      admin
+      alias
+      category
       id
-      initialized
-      logs
-      streamIndex
+      version
+      streams
     }
   }
 `;
 
 const envioQuery = `
-  query MyQuery {
-    Watcher(where: {id: {_eq: "${testId}"}}) {
-      actionIndex
-      chainId
-      id
-      initialized
-      logs
-      streamIndex
-    }
+query MyQuery {
+  Contract(where: {id: {_eq: "${testId}"}}) {
+    address
+    admin
+    alias
+    category
+    chainId
+    chainName
+    id
   }
+}
 `;
 
 const compare = async () => {
-  console.log("Watcher comparison");
+  console.log("Contracts comparison");
   // fetch data from theGraph by Id
   let graphData = await fetchQuery(
     "https://api.thegraph.com/subgraphs/name/sablier-labs/sablier-v2",
@@ -44,7 +46,7 @@ const compare = async () => {
   );
 
   // compare data
-  logObjectDifference(graphData.watcher, envioData.Watcher[0]);
+  logObjectDifference(graphData.contract, envioData.Contract[0]);
 };
 
 module.exports = { compare: compare };
