@@ -1,7 +1,7 @@
 let { logObjectDifference } = require("./helpers");
 let { fetchQuery } = require("./fetcher");
 
-const testId = "0xB10daee1FCF62243aE27776D7a92D39dC8740f95";
+const testId = "0xB10daee1FCF62243aE27776D7a92D39dC8740f95".toLowerCase();
 
 const subgraphQuery = `
   query MyQuery {
@@ -26,6 +26,7 @@ query MyQuery {
     category
     chainId
     chainName
+    version
     id
   }
 }
