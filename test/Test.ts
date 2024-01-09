@@ -1,17 +1,10 @@
 import { expect } from "chai";
-import {
-  MockDb,
-  createMockSablierV2LockupApprovalEvent,
-  createMockSablierV2LockupCreateLockupLinearStreamEvent,
-  eventProcessors,
-} from "../generated/src/TestHelpers.gen";
+import { MockDb, SablierV2Lockup } from "../generated/src/TestHelpers.gen";
 import {
   ActionEntity,
   AssetEntity,
-  SablierV2LockupContract_ApprovalEvent_log,
-  SablierV2LockupContract_CreateLockupLinearStreamEvent_log,
   StreamEntity,
-  watcherEntity,
+  WatcherEntity,
 } from "../generated/src/Types.gen";
 import {
   Addresses,
@@ -22,7 +15,7 @@ import { generateActionId } from "../src/helpers/action";
 import { generateStreamId } from "../src/helpers/streams";
 import { getChainInfoForAddress } from "../src/helpers/index";
 
-const defaultWatcherEntity: watcherEntity = {
+const defaultWatcherEntity: WatcherEntity = {
   id: "0",
   chainId: 1n,
   streamIndex: 1n,
@@ -32,7 +25,7 @@ const defaultWatcherEntity: watcherEntity = {
 };
 
 const defaultStreamEntity: StreamEntity = {
-  id: "",
+  id: "0xb10daee1fcf62243ae27776d7a92d39dc8740f95-1-1",
   tokenId: 0n,
   alias: "",
   contract: "",
@@ -68,35 +61,40 @@ const defaultStreamEntity: StreamEntity = {
 };
 
 describe("Sablier V2 Linear Lockup Stream Tests", () => {
+  // Initializing the mock database
+  const mockDbEmpty = MockDb.createMockDb();
+
+  // Initialize the entities in the mock database required for event processing
+  const mockDbWithStream = mockDbEmpty.entities.Stream.set(defaultStreamEntity);
+  const mockDbInitial =
+    mockDbWithStream.entities.Watcher.set(defaultWatcherEntity);
+
   it("Approval event is created correctly", () => {
-    // Initializing the mock database
-    let mockDbInitial = MockDb.createMockDb();
-
-    // Initialize the entities in the mock database required for event processing
-    mockDbInitial.entities.Stream.set(defaultStreamEntity);
-    mockDbInitial.entities.Watcher.set(defaultWatcherEntity);
-
     // Creating a mock event
-    let mockCreateLockupLinearApprovalEvent: SablierV2LockupContract_ApprovalEvent_log =
-      createMockSablierV2LockupApprovalEvent({
-        args: {
-          // (address indexed owner, address indexed approved, uint256 indexed tokenId)
-          owner: Addresses.defaultAddress,
-          approved: Addresses.defaultAddress,
-          tokenId: BigInt(1),
+    let mockCreateLockupLinearApprovalEvent =
+      SablierV2Lockup.Approval.createMockEvent({
+        // (address indexed owner, address indexed approved, uint256 indexed tokenId)
+        owner: Addresses.defaultAddress,
+        approved: Addresses.defaultAddress,
+        tokenId: BigInt(1),
+        //Need a valid lookup address to find the correct chain id
+        mockEventData: {
+          srcAddress: "0xb10daee1fcf62243ae27776d7a92d39dc8740f95",
         },
       });
 
     let actionId = generateActionId(mockCreateLockupLinearApprovalEvent);
     let streamId = generateStreamId(
       mockCreateLockupLinearApprovalEvent.srcAddress.toString(),
-      mockCreateLockupLinearApprovalEvent.params.tokenId
+      mockCreateLockupLinearApprovalEvent.params.tokenId,
     );
 
     // Processing the mock event on the mock database
-    let updatedMockDb = eventProcessors.SablierV2Lockup.Approval.processEvent({
+    let updatedMockDb = SablierV2Lockup.Approval.processEvent({
       event: mockCreateLockupLinearApprovalEvent,
       mockDb: mockDbInitial,
+      //Optional chainId is passed here explicitly since chain matters here
+      chainId: 1,
     });
 
     // Expected entity that should be created
@@ -106,7 +104,7 @@ describe("Sablier V2 Linear Lockup Stream Tests", () => {
       category: "Approval",
       chainId: BigInt(
         getChainInfoForAddress(mockCreateLockupLinearApprovalEvent.srcAddress)
-          .chainId
+          .chainId,
       ),
       contract: mockCreateLockupLinearApprovalEvent.srcAddress.toString(),
       hash: mockCreateLockupLinearApprovalEvent.transactionHash.toString(),
@@ -128,29 +126,21 @@ describe("Sablier V2 Linear Lockup Stream Tests", () => {
   });
 
   it("Asset entity is created correctly", () => {
-    // Initializing the mock database
-    let mockDbInitial = MockDb.createMockDb();
-
-    // Initialize the entities in the mock database required for event processing
-    mockDbInitial.entities.Stream.set(defaultStreamEntity);
-    mockDbInitial.entities.Watcher.set(defaultWatcherEntity);
-
     let assetId = Addresses_defaultAddress;
 
     // Creating a mock event
-    let mockCreateLockupLinearCreateLockupLinearStreamEvent: SablierV2LockupContract_CreateLockupLinearStreamEvent_log =
-      createMockSablierV2LockupCreateLockupLinearStreamEvent({
-        args: {
-          asset: assetId,
-        },
+    let mockCreateLockupLinearCreateLockupLinearStreamEvent =
+      SablierV2Lockup.CreateLockupLinearStream.createMockEvent({
+        asset: assetId,
       });
 
     // Processing the mock event on the mock database
-    let updatedMockDb =
-      eventProcessors.SablierV2Lockup.CreateLockupLinearStream.processEvent({
-        event: mockCreateLockupLinearCreateLockupLinearStreamEvent,
-        mockDb: mockDbInitial,
-      });
+    let updatedMockDb = SablierV2Lockup.CreateLockupLinearStream.processEvent({
+      event: mockCreateLockupLinearCreateLockupLinearStreamEvent,
+      mockDb: mockDbInitial,
+      //Optional chainId is passed here explicitly since chain matters here
+      chainId: 1,
+    });
 
     // Expected entity that should be created
     let expectedAssetEntity: AssetEntity = {
@@ -163,6 +153,8 @@ describe("Sablier V2 Linear Lockup Stream Tests", () => {
     let actualAssetEntity = updatedMockDb.entities.Asset.get(assetId);
 
     // Asserting that the entity in the mock database is the same as the expected entity
-    expect(expectedAssetEntity).to.equal(actualAssetEntity);
+    // Must use deep equal since Javascript comparator of objects will always be false, since
+    // it compares by reference not by value.
+    expect(expectedAssetEntity).to.deep.equal(actualAssetEntity);
   });
 });

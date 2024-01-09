@@ -206,7 +206,7 @@ const approval_handler = (input: approval_handler_input) => {
   let streamId = generateStreamId(event.srcAddress, streamTokenId);
   let stream = context.Stream.get(streamId);
 
-  if (stream == undefined) {
+  if (!stream) {
     context.log.info(
       `[SABLIER] Stream hasn't been registered before this Approval event: ${streamId}`
     );
