@@ -12,6 +12,8 @@ type Asset {
 type Contract {
   "unique identifier resolving to contract address"
   id: ID!
+  "full version based on the v2-core contract versioning system (e.g. '2.0' / '2.1')"
+  version: String!
   "hardcoded alias, resolved by replacing the contract address from the id with the contract alias"
   alias: String!
   "address of the contract"
@@ -64,6 +66,8 @@ type Action {
 type Stream {
   "unique identifier for the stream, resolving to the origin contract address concatenated with the chainId and the tokenId"
   id: ID!
+  "full version based on the v2-core contract versioning system (e.g. '2.0' / '2.1')"
+  version: String!
   "hardcoded alias, resolved by replacing the contract address from the id with the contract alias"
   alias: String!
   "unique global id tracked by the subgraph watcher - 🚨 these may change if new contracts are added and the chronological order of streams changes"
@@ -118,6 +122,8 @@ type Stream {
   startTime: BigInt!
   "snapshot of the duration (difference between end and start time)"
   duration: BigInt!
+  "flag showing the transferability of the stream (decided when the stream is created)"
+  transferable: Boolean!
   "amount deposit in the stream (without fees)"
   depositAmount: BigInt!
   "amount resolving to the sum still inside the stream (regardless of it being locked or not) (difference between deposit and withdrawn pre-cancel)"
