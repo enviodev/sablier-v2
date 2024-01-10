@@ -31,12 +31,12 @@ function createAction(
   let actionEntity: ActionEntity = {
     id: id,
     block: BigInt(event.blockNumber),
-    from: event.srcAddress.toString(),
+    from: event.srcAddress.toString().toLowerCase(),
     hash: event.transactionHash.toString(),
     timestamp: BigInt(event.blockTimestamp),
     subgraphId: watcher.actionIndex,
     chainId: BigInt(getChainInfoForAddress(event.srcAddress).chainId),
-    contract: contract_address,
+    contract: contract_address.toLowerCase(),
     addressA: "",
     addressB: "",
     amountA: 0n,
@@ -61,7 +61,7 @@ export function createApprovalAction(
 
   let actionEntity: ActionEntity = {
     ...partialActionEntity,
-    addressA: event.params.owner,
+    addressA: event.params.owner.toLowerCase(),
     addressB: event.params.approved, // todo: verify this is not a bug
   };
 
@@ -82,8 +82,8 @@ export function createApprovalForAllAction(
 
   let actionEntity: ActionEntity = {
     ...partialActionEntity,
-    addressA: event.params.owner,
-    addressB: event.params.operator,
+    addressA: event.params.owner.toLowerCase(),
+    addressB: event.params.operator.toLowerCase(),
     amountA: event.params.approved ? 1n : 0n,
   };
 
@@ -104,8 +104,8 @@ export function createCancelAction(
 
   let actionEntity: ActionEntity = {
     ...partialActionEntity,
-    addressA: event.params.sender,
-    addressB: event.params.recipient,
+    addressA: event.params.sender.toLowerCase(),
+    addressB: event.params.recipient.toLowerCase(),
     amountA: event.params.senderAmount,
     amountB: event.params.recipientAmount,
   };
@@ -130,8 +130,8 @@ export function createCreateAction(
 
   let actionEntity: ActionEntity = {
     ...partialActionEntity,
-    addressA: event.params.sender,
-    addressB: event.params.recipient,
+    addressA: event.params.sender.toLowerCase(),
+    addressB: event.params.recipient.toLowerCase(),
     amountA: event.params.amounts[0],
   };
 
@@ -166,8 +166,8 @@ export function createTransferAction(
 
   let actionEntity: ActionEntity = {
     ...partialActionEntity,
-    addressA: event.params.from,
-    addressB: event.params.to,
+    addressA: event.params.from.toLowerCase(),
+    addressB: event.params.to.toLowerCase(),
   };
 
   return actionEntity;
@@ -187,8 +187,8 @@ export function createWithdrawAction(
 
   let actionEntity: ActionEntity = {
     ...partialActionEntity,
-    addressA: event.srcAddress.toString(),
-    addressB: event.params.to,
+    addressA: event.srcAddress.toString().toLowerCase(),
+    addressB: event.params.to.toLowerCase(),
     amountB: event.params.amount,
   };
 
