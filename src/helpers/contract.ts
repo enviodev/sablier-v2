@@ -10,13 +10,14 @@ export function createContract(address: string): ContractEntity {
   let chainInfo = getChainInfoForAddress(address);
 
   const contractEntity: ContractEntity = {
-    id: address,
-    alias: chainInfo.aliasKey + "-" + address,
+    id: address.toLowerCase(),
+    version: chainInfo.version,
+    alias: chainInfo.aliasKey + "-" + address.toLowerCase(),
     chainId: BigInt(chainInfo.chainId),
     chainName: chainInfo.chainName,
     // TODO update this admin value to the correct one
     admin: "admin",
-    address: address,
+    address: address.toLowerCase(),
     category: getContractCategory(chainInfo.aliasKey),
   };
 
