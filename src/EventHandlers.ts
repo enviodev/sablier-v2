@@ -453,7 +453,8 @@ const createLockupDynamicStream_handler = (
     event,
     watcherEntity,
     contractEntity,
-    assetEntity
+    assetEntity,
+    context
   );
 
   // Create the action entity
