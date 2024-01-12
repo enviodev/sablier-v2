@@ -8,10 +8,14 @@ import {
   SablierV2LockupContract_CreateLockupLinearStreamEvent_eventArgs,
   SablierV2LockupContract_TransferEvent_eventArgs,
   SablierV2LockupContract_WithdrawFromLockupStreamEvent_eventArgs,
+  SablierV2LockupContract_CreateLockupDynamicStreamEvent_handlerContext,
+  SablierV21LockupContract_CreateLockupDynamicStreamEvent_handlerContext,
   AssetEntity,
 } from "../src/Types.gen";
 
 import { getChainInfoForAddress } from "./index";
+
+import { createSegments } from "./segments";
 
 import { add, div, minus, mul } from "./maths";
 
@@ -113,9 +117,14 @@ export function createDynamicStream(
   event: eventLog<SablierV2LockupContract_CreateLockupDynamicStreamEvent_eventArgs>,
   watcher: WatcherEntity,
   contract: ContractEntity,
-  asset: AssetEntity
+  asset: AssetEntity,
+  context:
+    | SablierV2LockupContract_CreateLockupDynamicStreamEvent_handlerContext
+    | SablierV21LockupContract_CreateLockupDynamicStreamEvent_handlerContext
 ): StreamEntity {
+  context.log.info("createDynamicStream");
   let tokenId = event.params.streamId;
+
   let partialStreamEntity: StreamEntity = createStream(
     tokenId,
     event,
@@ -123,12 +132,9 @@ export function createDynamicStream(
     contract
   );
 
-  // /** --------------- */
-  // entity = createSegments(entity, event);
-
   let duration = minus(event.params.range[1], event.params.range[0]);
 
-  const streamEntity: StreamEntity = {
+  const preSegmentsStreamEntity: StreamEntity = {
     ...partialStreamEntity,
     category: "LockupDynamic",
     endTime: event.params.range[1],
@@ -136,6 +142,12 @@ export function createDynamicStream(
     asset: asset.id,
     cliff: false,
   };
+
+  const streamEntity: StreamEntity = createSegments(
+    preSegmentsStreamEntity,
+    event,
+    context
+  );
 
   // TODO: leaving this out for now for the complexity it will add
   //   let resolved = bindProxyOwner(entity);
