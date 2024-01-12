@@ -125,7 +125,7 @@ export function createDynamicStream(
   context.log.info("createDynamicStream");
   let tokenId = event.params.streamId;
 
-  const partialStreamEntity: StreamEntity = createStream(
+  let partialStreamEntity: StreamEntity = createStream(
     tokenId,
     event,
     watcher,
@@ -134,8 +134,7 @@ export function createDynamicStream(
 
   let duration = minus(event.params.range[1], event.params.range[0]);
 
-  // const preSegmentsStreamEntity: StreamEntity = {
-  const streamEntity: StreamEntity = {
+  const preSegmentsStreamEntity: StreamEntity = {
     ...partialStreamEntity,
     category: "LockupDynamic",
     endTime: event.params.range[1],
@@ -144,11 +143,11 @@ export function createDynamicStream(
     cliff: false,
   };
 
-  // const streamEntity: StreamEntity = createSegments(
-  //   preSegmentsStreamEntity,
-  //   event,
-  //   context
-  // );
+  const streamEntity: StreamEntity = createSegments(
+    preSegmentsStreamEntity,
+    event,
+    context
+  );
 
   // TODO: leaving this out for now for the complexity it will add
   //   let resolved = bindProxyOwner(entity);

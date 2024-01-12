@@ -49,6 +49,7 @@ export function createSegments(
     | SablierV21LockupContract_CreateLockupDynamicStreamEvent_handlerContext
 ): StreamEntity {
   const segments = event.params.segments;
+
   let streamed = 0n;
 
   let segmentInput: SegmentInput = {
@@ -61,9 +62,6 @@ export function createSegments(
 
   for (let i = 0; i < segments.length; i++) {
     const segment = segments[i];
-
-    console.log("segment");
-    console.log(segment);
 
     const amount = segment[0] ?? 0n;
     const exponent = segment[1] ?? 0n;
