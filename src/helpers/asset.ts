@@ -6,8 +6,8 @@ export function createAsset(
   chainId: bigint
 ): AssetEntity {
   const assetEntity: AssetEntity = {
-    id: assetAddress,
-    address: assetAddress,
+    id: assetAddress.toLowerCase(),
+    address: assetAddress.toLowerCase(),
     chainId: chainId,
   };
 
