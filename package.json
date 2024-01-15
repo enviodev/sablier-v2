@@ -9,7 +9,7 @@
     "dev": "envio dev",
     "test": "mocha --require ts-node/register test/**/*.ts",
     "compare": "node test/comparisons/index.js",
-    "start": "ts-node generated/src/Index.bs.js"
+    "start": "ts-node generated/src/Index.bs.js"    
   },
   "devDependencies": {
     "@types/node": "20.8.8",
