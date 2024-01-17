@@ -8,8 +8,8 @@ import {
   SablierV2LockupContract_CreateLockupLinearStreamEvent_eventArgs,
   SablierV2LockupContract_TransferEvent_eventArgs,
   SablierV2LockupContract_WithdrawFromLockupStreamEvent_eventArgs,
-  SablierV2LockupContract_CreateLockupDynamicStreamEvent_handlerContext,
-  SablierV21LockupContract_CreateLockupDynamicStreamEvent_handlerContext,
+  SablierV2LockupContract_CreateLockupDynamicStreamEvent_handlerContextAsync,
+  SablierV21LockupContract_CreateLockupDynamicStreamEvent_handlerContextAsync,
   AssetEntity,
 } from "../src/Types.gen";
 
@@ -119,8 +119,8 @@ export function createDynamicStream(
   contract: ContractEntity,
   asset: AssetEntity,
   context:
-    | SablierV2LockupContract_CreateLockupDynamicStreamEvent_handlerContext
-    | SablierV21LockupContract_CreateLockupDynamicStreamEvent_handlerContext
+    | SablierV2LockupContract_CreateLockupDynamicStreamEvent_handlerContextAsync
+    | SablierV21LockupContract_CreateLockupDynamicStreamEvent_handlerContextAsync
 ): StreamEntity {
   context.log.info("createDynamicStream");
   let tokenId = event.params.streamId;

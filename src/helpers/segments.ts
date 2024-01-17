@@ -4,8 +4,8 @@ import {
   StreamEntity,
   SablierV2LockupContract_CreateLockupDynamicStreamEvent_eventArgs,
   SablierV21LockupContract_CreateLockupDynamicStreamEvent_eventArgs,
-  SablierV2LockupContract_CreateLockupDynamicStreamEvent_handlerContext,
-  SablierV21LockupContract_CreateLockupDynamicStreamEvent_handlerContext,
+  SablierV2LockupContract_CreateLockupDynamicStreamEvent_handlerContextAsync,
+  SablierV21LockupContract_CreateLockupDynamicStreamEvent_handlerContextAsync,
 } from "../src/Types.gen";
 import { add } from "./maths";
 
@@ -45,8 +45,8 @@ export function createSegments(
     | SablierV21LockupContract_CreateLockupDynamicStreamEvent_eventArgs
   >,
   context:
-    | SablierV2LockupContract_CreateLockupDynamicStreamEvent_handlerContext
-    | SablierV21LockupContract_CreateLockupDynamicStreamEvent_handlerContext
+    | SablierV2LockupContract_CreateLockupDynamicStreamEvent_handlerContextAsync
+    | SablierV21LockupContract_CreateLockupDynamicStreamEvent_handlerContextAsync
 ): StreamEntity {
   const segments = event.params.segments;
 
