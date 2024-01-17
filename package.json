@@ -9,20 +9,20 @@
     "dev": "envio dev",
     "test": "mocha --require ts-node/register test/**/*.ts",
     "compare": "node test/comparisons/index.js",
-    "start": "ts-node generated/src/Index.bs.js"    
+    "start": "ts-node generated/src/Index.bs.js"
   },
   "devDependencies": {
-    "@types/node": "20.8.8",
-    "typescript": "5.2.2",
     "@types/chai": "4.3.11",
     "@types/mocha": "10.0.6",
+    "@types/node": "20.8.8",
     "chai": "4.3.10",
     "ethers": "6.8.0",
     "mocha": "10.2.0",
-    "rescript": "10.1.4"    
+    "rescript": "10.1.4",
+    "typescript": "5.2.2"
   },
   "dependencies": {
-    "ts-node": "10.9.1",
-    "envio": "latest"
+    "envio": "^0.0.27",
+    "ts-node": "10.9.1"
   }
 }
